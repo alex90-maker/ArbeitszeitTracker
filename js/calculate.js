@@ -37,6 +37,8 @@ function calculate() {
   else                 { st = "Im Plan";    co = "#d97706"; av = "Weiter so - du bist genau auf Kurs."; }
 
   var sg = diff >= 0 ? "+" : "-", dc = diff >= 0 ? "#16a34a" : "#dc2626";
+  var futureOT = s + rem * OTP;
+  var maxVacDays = Math.max(0, Math.floor(futureOT / (OTP + VAC)));
 
   function rw(l, v) { return "<div class='detail-row'><span>" + l + "</span><span>" + v + "</span></div>"; }
 
@@ -49,6 +51,13 @@ function calculate() {
     + rw("OT generiert", fm(otG))
     + rw("OT-Soll heute", fm(otS))
     + rw("Gesamtziel OT", fm(tn))
+    + "</div>"
+    + "<div class='white-card'><div class='wc-label' style='margin-bottom:10px'>Hochrechnung OT-Ferientage</div>"
+    + rw("Aktuelles Saldo", fm(s))
+    + rw("Projektion " + rem + " AT \xd7 50 Min", "+" + fm(rem * OTP))
+    + rw("Total OT-Pool", fm(futureOT))
+    + rw("Kosten / OT-Ferientag", fm(OTP + VAC))
+    + "<div style='border-top:2px solid #e2e8f0;margin-top:8px;padding-top:10px'><div class='wc-label'>Noch entnehmbar bis 31.12." + YR + "</div><div class='diff-val' style='color:#7c3aed'>" + maxVacDays + " Tage</div><div class='diff-sub'>OT-Kompensationsurlaub (Hochrechnung)</div></div>"
     + "</div>"
     + "<div class='info-box'>Logik: OT = Saldo + komp. Std + Komp.Tage x7h34. Soll = (vergangene AT - Ferientage) x 50 Min. Feiertage Kanton Zug.</div>";
 }
