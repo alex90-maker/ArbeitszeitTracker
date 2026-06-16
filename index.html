@@ -1,78 +1,18 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arbeitszeit-Tracker 2026</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; justify-content: center; padding: 24px 16px; color: #1e293b; }
-.wrap { width: 100%; max-width: 860px; }
-h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.sub { font-size: 13px; color: #64748b; margin-bottom: 24px; }
-.main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 700px) { .main-grid { grid-template-columns: 1fr; } }
-.card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 14px; }
-.card label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
-input[type=text], input[type=date] { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; }
-.hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-.stitle { font-size: 13px; font-weight: 600; color: #475569; margin: 12px 0 8px; }
-.divider { border: none; border-top: 1px solid #e2e8f0; margin: 12px 0; }
-.erow { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-.erow input[type=date] { flex: 1; padding: 9px 8px; font-size: 14px; }
-.sep { color: #94a3b8; font-size: 14px; flex-shrink: 0; }
-.del-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1; }
-.del-btn:hover { color: #dc2626; }
-.add-btn { background: none; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b; font-size: 13px; padding: 7px 12px; cursor: pointer; width: 100%; margin-top: 4px; }
-.add-btn:hover { background: #f1f5f9; }
-.ktotal { font-size: 13px; color: #2563eb; font-weight: 600; margin-top: 8px; min-height: 18px; }
-.ftotal { font-size: 13px; color: #d97706; font-weight: 600; margin-top: 8px; min-height: 18px; }
-.btn-row { display: flex; gap: 10px; margin-bottom: 8px; }
-.calc-btn { flex: 1; padding: 13px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
-.calc-btn:hover { background: #1d4ed8; }
-.save-btn { padding: 13px 14px; background: #fff; color: #16a34a; border: 2px solid #16a34a; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.save-btn:hover { background: #f0fdf4; }
-.notice { font-size: 12px; font-weight: 600; min-height: 18px; margin-bottom: 6px; color: #16a34a; }
-.link-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 12px; color: #166534; display: none; }
-.copy-btn { margin-top: 8px; padding: 5px 10px; background: #16a34a; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
-.status-banner { border-radius: 12px; padding: 18px 20px; color: #fff; margin-bottom: 12px; }
-.status-title { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
-.status-advice { font-size: 15px; }
-.white-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-.wc-label { font-weight: 700; font-size: 14px; color: #64748b; margin-bottom: 4px; }
-.diff-val { font-size: 28px; font-weight: 800; }
-.diff-sub { font-size: 13px; color: #94a3b8; margin-top: 2px; }
-.detail-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
-.detail-row span:first-child { color: #64748b; }
-.detail-row span:last-child { font-weight: 600; }
-.info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px; font-size: 12px; color: #1e40af; }
-.error-box { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 10px; padding: 14px; color: #b91c1c; margin-bottom: 12px; }
-.cal-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #1e293b; }
-.cal-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; font-size: 12px; }
-.leg { display: flex; align-items: center; gap: 5px; }
-.leg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-.months-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 700px) { .months-grid { grid-template-columns: 1fr; } }
-.month-block { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; }
-.month-name { font-weight: 700; font-size: 14px; margin-bottom: 8px; color: #1e293b; }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-dow { font-size: 10px; font-weight: 600; color: #94a3b8; text-align: center; padding: 2px 0; }
-.cal-day { font-size: 11px; text-align: center; padding: 3px 1px; border-radius: 4px; line-height: 1.4; }
-.cal-day.empty { background: none; }
-.cal-day.weekend { color: #94a3b8; background: #f8fafc; }
-.cal-day.holiday { background: #fef2f2; color: #dc2626; font-weight: 700; }
-.cal-day.vacation { background: #fef9c3; color: #92400e; font-weight: 600; }
-.cal-day.kompensation { background: #dbeafe; color: #1d4ed8; font-weight: 600; }
-.cal-day.workday { background: #f0fdf4; color: #166534; }
-.cal-day.prefeiertag { background: #fff7ed; color: #c2410c; font-weight: 600; }
-.cal-day.today { outline: 2px solid #2563eb; outline-offset: -1px; font-weight: 800; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arbeitszeit-Tracker 2026</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="wrap">
   <h1>Arbeitszeit-Tracker 2026</h1>
   <p class="sub">90% Pensum &middot; 50 Min. Ueberzeit/Tag &middot; Ziel: 10 Wochen Urlaub</p>
+
   <div class="main-grid">
+    <!-- Linke Spalte -->
     <div>
       <div class="card">
         <label>Aktuelles Ueberzeitsaldo</label>
@@ -113,14 +53,15 @@ input[type=text], input[type=date] { width: 100%; padding: 10px 12px; border: 1p
       <div id="output"></div>
     </div>
 
+    <!-- Rechte Spalte: Kalender -->
     <div class="cal-section">
       <h2>Kalender 2026</h2>
       <div class="cal-legend">
         <div class="leg"><div class="leg-dot" style="background:#f0fdf4;border:1px solid #86efac"></div> Arbeitstag</div>
         <div class="leg"><div class="leg-dot" style="background:#fef2f2;border:1px solid #fca5a5"></div> Feiertag</div>
+        <div class="leg"><div class="leg-dot" style="background:#fff7ed;border:1px solid #fdba74"></div> Vorfeiertag</div>
         <div class="leg"><div class="leg-dot" style="background:#fef9c3;border:1px solid #fde68a"></div> Ferien</div>
         <div class="leg"><div class="leg-dot" style="background:#dbeafe;border:1px solid #93c5fd"></div> Kompensation</div>
-        <div class="leg"><div class="leg-dot" style="background:#fff7ed;border:1px solid #fdba74"></div> Vorfeiertag</div>
         <div class="leg"><div class="leg-dot" style="background:#f8fafc;border:1px solid #e2e8f0"></div> Wochenende</div>
         <div class="leg"><div class="leg-dot" style="outline:2px solid #2563eb;outline-offset:-1px;background:#fff"></div> Heute</div>
       </div>
@@ -129,283 +70,16 @@ input[type=text], input[type=date] { width: 100%; padding: 10px 12px; border: 1p
   </div>
 </div>
 
+<!-- Scripts in Ladereihenfolge -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/entries.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/calculate.js"></script>
+<script src="js/storage.js"></script>
 <script>
-var VAC = 454, OTP = 50, YR = 2026, kompEnts = [], ferienEnts = [], TWD = 0;
-var H = ["2026-01-01","2026-01-02","2026-04-03","2026-04-06","2026-05-14","2026-05-25","2026-06-04","2026-08-01","2026-08-15","2026-11-01","2026-12-08","2026-12-25","2026-12-26"];
-var HNAMES = {"2026-01-01":"Neujahr","2026-01-02":"Berchtoldstag","2026-04-03":"Karfreitag","2026-04-06":"Ostermontag","2026-05-14":"Auffahrt","2026-05-25":"Pfingstmontag","2026-06-04":"Fronleichnam","2026-08-01":"Nationalfeiertag","2026-08-15":"Maria Himmelfahrt","2026-11-01":"Allerheiligen","2026-12-08":"Maria Empfaengnis","2026-12-25":"Weihnachten","2026-12-26":"Stephanstag"};
-var PRE = {"2026-04-02":"Vorfeiertag Karfreitag","2026-05-13":"Vorfeiertag Auffahrt","2026-06-03":"Vorfeiertag Fronleichnam","2026-07-31":"Vorfeiertag Nationalfeiertag","2026-08-14":"Vorfeiertag Maria Himmelfahrt","2026-12-07":"Vorfeiertag Maria Empfaengnis","2026-12-24":"Vorfeiertag Weihnachten","2026-12-30":"Vorfeiertag Stephanstag","2026-12-31":"Vorfeiertag Neujahr"};
-var MONTHS = ["Januar","Februar","Maerz","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-function fmtDate(s) { if (!s) return ""; var p = s.split("-"); return p[2] + "." + p[1] + "." + p[0]; }
-var DOWS = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-
-function p2(n) { return n < 10 ? "0" + n : "" + n; }
-function ds(d) { return d.getFullYear() + "-" + p2(d.getMonth()+1) + "-" + p2(d.getDate()); }
-function iw(d) { return d.getDay() === 0 || d.getDay() === 6; }
-function ih(s) { for (var i = 0; i < H.length; i++) if (H[i] === s) return true; return false; }
-function isWD(d) { return !iw(d) && !ih(ds(d)); }
-
-// Parse dd.mm.yyyy or yyyy-mm-dd -> yyyy-mm-dd
-function toISO(s) {
-  s = (s || "").trim();
-  if (!s) return "";
-  // already ISO
-  if (s.match(/^\d{4}-\d{2}-\d{2}$/)) return s;
-  // dd.mm.yyyy or dd.mm.yy
-  var p = s.split(".");
-  if (p.length === 3) {
-    var d = p[0], m = p[1], y = p[2];
-    if (y.length === 2) y = "20" + y;
-    return y + "-" + p2(parseInt(m,10)) + "-" + p2(parseInt(d,10));
-  }
-  return s;
-}
-// Format yyyy-mm-dd -> dd.mm.yyyy
-function toCH(s) {
-  if (!s) return "";
-  var p = s.split("-");
-  if (p.length === 3) return p[2] + "." + p[1] + "." + p[0];
-  return s;
-}
-
-function nm(s) {
-  s = (s || "").trim();
-  var neg = s.charAt(0) === "-";
-  if (neg) s = s.slice(1);
-  if (s.indexOf(".") > -1 && s.indexOf(":") < 0) s = s.replace(".", ":");
-  return neg ? "-" + s : s;
-}
-function pt(s) {
-  s = nm(s); if (!s) return null;
-  var neg = s.charAt(0) === "-";
-  if (neg) s = s.slice(1);
-  var p = s.split(":"); if (p.length !== 2) return null;
-  var h = parseInt(p[0], 10), m = parseInt(p[1], 10);
-  if (isNaN(h) || isNaN(m)) return null;
-  return neg ? -(h * 60 + m) : h * 60 + m;
-}
-function fm(x) {
-  var neg = x < 0, a = Math.abs(Math.round(x));
-  return (neg ? "-" : "") + Math.floor(a / 60) + "h " + p2(a % 60) + "min";
-}
-function cwd(f, t) {
-  var n = 0, d = new Date(f), e = new Date(t);
-  e.setHours(23, 59, 59, 999);
-  while (d <= e) { if (isWD(d)) n++; d.setDate(d.getDate() + 1); }
-  return n;
-}
-function elap() {
-  var n = 0, d = new Date(YR, 0, 1), e = new Date();
-  e.setHours(0, 0, 0, 0);
-  while (d < e) { if (isWD(d)) n++; d.setDate(d.getDate() + 1); }
-  return n;
-}
-function initTWD() {
-  var n = 0, d = new Date(YR, 0, 1);
-  while (d.getFullYear() === YR) { if (isWD(d)) n++; d.setDate(d.getDate() + 1); }
-  TWD = n;
-}
-
-// Count workdays in entries list
-function countDaysFromEnts(list) {
-  var t = 0;
-  for (var i = 0; i < list.length; i++) {
-    var e = list[i];
-    if (e.f && e.t) { var f = new Date(e.f), to = new Date(e.t); if (to >= f) t += cwd(f, to); }
-    else if (e.f) { var d = new Date(e.f); if (isWD(d)) t += 1; }
-  }
-  return t;
-}
-
-// Count elapsed workdays that fall on vacation days (to reduce soll)
-function ferienElapsed() {
-  var ferDays = getDaysSet(ferienEnts);
-  var n = 0, d = new Date(YR, 0, 1), e = new Date();
-  e.setHours(0, 0, 0, 0);
-  while (d < e) {
-    if (isWD(d) && ferDays[ds(d)]) n++;
-    d.setDate(d.getDate() + 1);
-  }
-  return n;
-}
-
-function getDaysSet(list) {
-  var days = {};
-  for (var i = 0; i < list.length; i++) {
-    var e = list[i];
-    if (e.f && e.t) {
-      var d = new Date(e.f), to = new Date(e.t); to.setHours(23,59,59,999);
-      while (d <= to) { days[ds(d)] = true; d.setDate(d.getDate() + 1); }
-    } else if (e.f) { days[e.f] = true; }
-  }
-  return days;
-}
-
-function ut() {
-  // Kompensation total
-  var h = pt(document.getElementById("komp").value) || 0;
-  var kDays = countDaysFromEnts(kompEnts);
-  var kTot = h + kDays * VAC;
-  document.getElementById("ktotal").textContent = kTot > 0 ? "Total: " + fm(kTot) + (kDays > 0 ? " (davon " + kDays + " Tage = " + fm(kDays * VAC) + ")" : "") : "";
-
-  // Ferien total
-  var fDays = countDaysFromEnts(ferienEnts);
-  document.getElementById("ftotal").textContent = fDays > 0 ? fDays + " Arbeitstage eingetragen" : "";
-
-  buildCalendar();
-}
-
-// --- Entry rendering helper ---
-function makeDateInput(val, eid, ek, updateFn) {
-  var inp = document.createElement("input");
-  inp.type = "text";
-  inp.placeholder = "dd.mm.yyyy";
-  inp.value = toCH(val);
-  inp.style.flex = "1";
-  inp.style.padding = "9px 8px";
-  inp.style.fontSize = "14px";
-  inp.setAttribute("eid", "" + eid);
-  inp.setAttribute("ek", ek);
-  inp.onblur = function() {
-    var iso = toISO(this.value);
-    this.value = toCH(iso);
-    updateFn(parseFloat(this.getAttribute("eid")), this.getAttribute("ek"), iso);
-  };
-  return inp;
-}
-
-function makeEntryRow(e, updateFn, deleteFn) {
-  var row = document.createElement("div"); row.className = "erow";
-  var d1 = makeDateInput(e.f, e.id, "f", updateFn);
-  var sp = document.createElement("span"); sp.className = "sep"; sp.textContent = "bis";
-  var d2 = makeDateInput(e.t, e.id, "t", updateFn);
-  var db = document.createElement("button"); db.className = "del-btn"; db.type = "button"; db.textContent = "x"; db.setAttribute("eid", "" + e.id); db.onclick = function() { deleteFn(parseFloat(this.getAttribute("eid"))); };
-  row.appendChild(d1); row.appendChild(sp); row.appendChild(d2); row.appendChild(db);
-  return row;
-}
-
-// Kompensation entries
-function addKomp(f, t) { kompEnts.push({ id: Date.now() + Math.random(), f: f || "", t: t || "" }); renderKomp(); }
-function delKomp(id) { var a = []; for (var i = 0; i < kompEnts.length; i++) if (kompEnts[i].id !== id) a.push(kompEnts[i]); kompEnts = a; renderKomp(); }
-function updKomp(id, k, v) { for (var i = 0; i < kompEnts.length; i++) if (kompEnts[i].id === id) kompEnts[i][k] = v; ut(); }
-function renderKomp() {
-  var c = document.getElementById("kompEntries"); c.innerHTML = "";
-  for (var i = 0; i < kompEnts.length; i++) c.appendChild(makeEntryRow(kompEnts[i], updKomp, delKomp));
-  ut();
-}
-
-// Ferien entries
-function addFerien(f, t) { ferienEnts.push({ id: Date.now() + Math.random(), f: f || "", t: t || "" }); renderFerien(); }
-function delFerien(id) { var a = []; for (var i = 0; i < ferienEnts.length; i++) if (ferienEnts[i].id !== id) a.push(ferienEnts[i]); ferienEnts = a; renderFerien(); }
-function updFerien(id, k, v) { for (var i = 0; i < ferienEnts.length; i++) if (ferienEnts[i].id === id) ferienEnts[i][k] = v; ut(); }
-function renderFerien() {
-  var c = document.getElementById("ferienEntries"); c.innerHTML = "";
-  for (var i = 0; i < ferienEnts.length; i++) c.appendChild(makeEntryRow(ferienEnts[i], updFerien, delFerien));
-  ut();
-}
-
-function showNotice(m) { var el = document.getElementById("notice"); el.textContent = m; setTimeout(function() { el.textContent = ""; }, 5000); }
-
-function calculate() {
-  var se = document.getElementById("saldo"), ke = document.getElementById("komp");
-  se.value = nm(se.value); ke.value = nm(ke.value); ut();
-  var s = pt(se.value), o = document.getElementById("output");
-  if (s === null) { o.innerHTML = "<div class='error-box'>Bitte Saldo eingeben (z.B. 20:52)</div>"; return; }
-
-  var kh = pt(ke.value) || 0;
-  var kDays = countDaysFromEnts(kompEnts);
-  var komp = kh + kDays * VAC;
-
-  var el = elap();
-  var ferEl = ferienElapsed(); // vergangene Ferientage reduzieren Soll
-  var rem = TWD - el;
-  var otG = s + komp;
-  var otS = (el - ferEl) * OTP; // Soll nur auf Arbeitstage ohne Ferien
-  var diff = otG - otS;
-  var dd = (Math.abs(diff) / VAC).toFixed(1), tn = 27.5 * VAC;
-  var st, co, av;
-  if (diff > 60)       { st = "Ueber Plan"; co = "#16a34a"; av = "Du koenntest weniger arbeiten oder mehr Ferien nehmen."; }
-  else if (diff < -60) { st = "Unter Plan"; co = "#dc2626"; av = "Du solltest ab heute mehr arbeiten."; }
-  else                 { st = "Im Plan";    co = "#d97706"; av = "Weiter so - du bist genau auf Kurs."; }
-  var sg = diff >= 0 ? "+" : "-", dc = diff >= 0 ? "#16a34a" : "#dc2626";
-  function rw(l, v) { return "<div class='detail-row'><span>" + l + "</span><span>" + v + "</span></div>"; }
-  o.innerHTML = "<div class='status-banner' style='background:" + co + "'><div class='status-title'>" + st + "</div><div class='status-advice'>" + av + "</div></div>"
-    + "<div class='white-card'><div class='wc-label'>Differenz zum Soll</div><div class='diff-val' style='color:" + dc + "'>" + sg + fm(Math.abs(diff)) + "</div><div class='diff-sub'>ca. " + sg + dd + " Ferientage</div></div>"
-    + "<div class='white-card'><div class='wc-label' style='margin-bottom:10px'>Details</div>"
-    + rw("Vergangene AT", el + " / " + TWD)
-    + rw("Davon Ferientage (vergangen)", ferEl)
-    + rw("Verbleibende AT", rem)
-    + rw("OT generiert", fm(otG))
-    + rw("OT-Soll heute", fm(otS))
-    + rw("Gesamtziel OT", fm(tn))
-    + "</div>"
-    + "<div class='info-box'>Logik: OT = Saldo + komp. Std + Komp.Tage x7h34. Soll = (vergangene AT - Ferientage) x 50 Min. Feiertage Kanton Zug.</div>";
-}
-
-function buildCalendar() {
-  var kompDays = getDaysSet(kompEnts);
-  var ferDays = getDaysSet(ferienEnts);
-  var today = ds(new Date());
-  var grid = document.getElementById("calGrid"); grid.innerHTML = "";
-  for (var mo = 0; mo < 12; mo++) {
-    var block = document.createElement("div"); block.className = "month-block";
-    var title = document.createElement("div"); title.className = "month-name"; title.textContent = MONTHS[mo] + " 2026"; block.appendChild(title);
-    var cg = document.createElement("div"); cg.className = "cal-grid";
-    for (var dw = 0; dw < 7; dw++) { var dow = document.createElement("div"); dow.className = "cal-dow"; dow.textContent = DOWS[dw]; cg.appendChild(dow); }
-    var firstDay = new Date(YR, mo, 1).getDay(), offset = (firstDay + 6) % 7;
-    for (var x = 0; x < offset; x++) { var emp = document.createElement("div"); emp.className = "cal-day empty"; cg.appendChild(emp); }
-    var dim = new Date(YR, mo + 1, 0).getDate();
-    for (var day = 1; day <= dim; day++) {
-      var date = new Date(YR, mo, day), dateStr = ds(date);
-      var cell = document.createElement("div"); cell.className = "cal-day";
-      var tip = "";
-      if (ih(dateStr)) { cell.className += " holiday"; tip = HNAMES[dateStr] || "Feiertag"; }
-      else if (iw(date)) { cell.className += " weekend"; }
-      else if (kompDays[dateStr]) { cell.className += " kompensation"; tip = "Kompensation"; }
-      else if (ferDays[dateStr]) { cell.className += " vacation"; tip = "Ferien"; }
-      else if (PRE[dateStr]) { cell.className += " prefeiertag"; tip = PRE[dateStr]; }
-      else { cell.className += " workday"; }
-      if (dateStr === today) cell.className += " today";
-      cell.textContent = day;
-      if (tip) cell.title = tip;
-      cg.appendChild(cell);
-    }
-    block.appendChild(cg); grid.appendChild(block);
-  }
-}
-
-function saveLink() {
-  var s = nm(document.getElementById("saldo").value);
-  var k = nm(document.getElementById("komp").value);
-  var ka = []; for (var i = 0; i < kompEnts.length; i++) ka.push({ f: kompEnts[i].f, t: kompEnts[i].t });
-  var fa = []; for (var i = 0; i < ferienEnts.length; i++) fa.push({ f: ferienEnts[i].f, t: ferienEnts[i].t });
-  var data = { s: s, k: k, e: ka, f: fa };
-  var hash = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  window.location.hash = hash;
-  var lb = document.getElementById("linkbox"); lb.style.display = "block";
-  document.getElementById("linktext").textContent = window.location.href;
-  showNotice("Link gespeichert - Ctrl+D zum Aktualisieren des Lesezeichens!");
-}
-function copyLink() {
-  var url = window.location.href;
-  if (navigator.clipboard) { navigator.clipboard.writeText(url).then(function() { showNotice("Link kopiert!"); }); }
-  else { var ta = document.createElement("textarea"); ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); showNotice("Link kopiert!"); }
-}
-function loadFromHash() {
-  initTWD();
-  var hash = window.location.hash.replace("#", "");
-  if (!hash) { buildCalendar(); return; }
-  try {
-    var data = JSON.parse(decodeURIComponent(escape(atob(hash))));
-    if (data.s) document.getElementById("saldo").value = data.s;
-    if (data.k) document.getElementById("komp").value = data.k;
-    if (data.e) { kompEnts = []; for (var i = 0; i < data.e.length; i++) kompEnts.push({ id: Date.now() + Math.random(), f: data.e[i].f || "", t: data.e[i].t || "" }); }
-    if (data.f) { ferienEnts = []; for (var i = 0; i < data.f.length; i++) ferienEnts.push({ id: Date.now() + Math.random(), f: data.f[i].f || "", t: data.f[i].t || "" }); }
-    renderKomp(); renderFerien();
-    if (data.s) calculate();
-  } catch(e) { buildCalendar(); }
-}
-document.addEventListener("keydown", function(e) { if (e.key === "Enter") calculate(); });
-window.onload = loadFromHash;
+  document.addEventListener("keydown", function(e) { if (e.key === "Enter") calculate(); });
+  window.onload = loadFromHash;
 </script>
 </body>
 </html>
