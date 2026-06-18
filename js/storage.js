@@ -1,10 +1,9 @@
 function saveLink() {
   var s = nm(document.getElementById("saldo").value);
-  var k = nm(document.getElementById("komp").value);
   var ka = [], fa = [];
   for (var i = 0; i < kompEnts.length; i++) ka.push({ f: kompEnts[i].f, t: kompEnts[i].t });
   for (var i = 0; i < ferienEnts.length; i++) fa.push({ f: ferienEnts[i].f, t: ferienEnts[i].t });
-  var hash = btoa(unescape(encodeURIComponent(JSON.stringify({ s: s, k: k, e: ka, f: fa }))));
+  var hash = btoa(unescape(encodeURIComponent(JSON.stringify({ s: s, e: ka, f: fa }))));
   window.location.hash = hash;
   var lb = document.getElementById("linkbox"); lb.style.display = "block";
   document.getElementById("linktext").textContent = window.location.href;
@@ -29,7 +28,6 @@ function loadFromHash() {
   try {
     var data = JSON.parse(decodeURIComponent(escape(atob(hash))));
     if (data.s) document.getElementById("saldo").value = data.s;
-    if (data.k) document.getElementById("komp").value = data.k;
     if (data.e) { kompEnts = []; for (var i = 0; i < data.e.length; i++) kompEnts.push({ id: Date.now()+Math.random(), f: data.e[i].f||"", t: data.e[i].t||"" }); }
     if (data.f) { ferienEnts = []; for (var i = 0; i < data.f.length; i++) ferienEnts.push({ id: Date.now()+Math.random(), f: data.f[i].f||"", t: data.f[i].t||"" }); }
     renderKomp(); renderFerien();

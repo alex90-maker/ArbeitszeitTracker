@@ -59,10 +59,8 @@ function countDaysFromEnts(list) {
 }
 
 function ut() {
-  var h = pt(document.getElementById("komp").value) || 0;
-  var kd = countDaysFromEnts(kompEnts), kt = h + kd * VAC;
-  document.getElementById("ktotal").textContent = kt > 0
-    ? "Total: " + fm(kt) + (kd > 0 ? " (davon " + kd + " Tage = " + fm(kd*VAC) + ")" : "") : "";
+  var kd = countDaysFromEnts(kompEnts), kt = kd * VAC;
+  document.getElementById("ktotal").textContent = kd > 0 ? "Total: " + fm(kt) + " (" + kd + " Tage)" : "";
   var fd = countDaysFromEnts(ferienEnts);
   document.getElementById("ftotal").textContent = fd > 0 ? fd + " Arbeitstage eingetragen" : "";
   buildCalendar();

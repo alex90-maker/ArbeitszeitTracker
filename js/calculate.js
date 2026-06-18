@@ -18,17 +18,23 @@ function ferienElapsed() {
   return n;
 }
 
+function kompElapsed() {
+  var kd = getDaysSet(kompEnts), n = 0, d = new Date(YR, 0, 1), e = new Date();
+  e.setHours(0, 0, 0, 0);
+  while (d < e) { if (isWD(d) && kd[ds(d)]) n++; d.setDate(d.getDate()+1); }
+  return n;
+}
+
 function calculate() {
-  var se = document.getElementById("saldo"), ke = document.getElementById("komp");
-  se.value = nm(se.value); ke.value = nm(ke.value); ut();
+  var se = document.getElementById("saldo");
+  se.value = nm(se.value); ut();
   var s = pt(se.value), o = document.getElementById("output");
   if (s === null) { o.innerHTML = "<div class='error-box'>Bitte Saldo eingeben (z.B. 20:52)</div>"; return; }
 
-  var kh = pt(ke.value) || 0;
   var kd = countDaysFromEnts(kompEnts);
-  var komp = kh + kd * VAC;
-  var el = elap(), ferEl = ferienElapsed(), rem = TWD - el;
-  var otG = s + komp, otS = (el - ferEl) * OTP, diff = otG - otS;
+  var komp = kd * VAC;
+  var el = elap(), ferEl = ferienElapsed(), kompEl = kompElapsed(), rem = TWD - el;
+  var otG = s + komp, otS = (el - ferEl - kompEl) * OTP, diff = otG - otS;
   var dd = (Math.abs(diff) / VAC).toFixed(1), tn = 27.5 * VAC;
 
   var st, co, av;
@@ -47,6 +53,7 @@ function calculate() {
     + "<div class='white-card'><div class='wc-label' style='margin-bottom:10px'>Details</div>"
     + rw("Vergangene AT", el + " / " + TWD)
     + rw("Davon Ferientage", ferEl)
+    + rw("Davon Kompensationstage", kompEl)
     + rw("Verbleibende AT", rem)
     + rw("OT generiert", fm(otG))
     + rw("OT-Soll heute", fm(otS))
@@ -59,5 +66,5 @@ function calculate() {
     + rw("Kosten / OT-Ferientag", fm(OTP + VAC))
     + "<div style='border-top:2px solid #e2e8f0;margin-top:8px;padding-top:10px'><div class='wc-label'>Noch entnehmbar bis 31.12." + YR + "</div><div class='diff-val' style='color:#7c3aed'>" + maxVacDays + " Tage</div><div class='diff-sub'>OT-Kompensationsurlaub (Hochrechnung)</div></div>"
     + "</div>"
-    + "<div class='info-box'>Logik: OT = Saldo + komp. Std + Komp.Tage x7h34. Soll = (vergangene AT - Ferientage) x 50 Min. Feiertage Kanton Zug.</div>";
+    + "<div class='info-box'>Logik: OT = Saldo + komp. Std + Komp.Tage x7h34. Soll = (vergangene AT - Ferientage - Kompensationstage) x 50 Min. Feiertage Kanton Zug.</div>";
 }
