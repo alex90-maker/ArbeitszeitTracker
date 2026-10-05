@@ -48,20 +48,47 @@ function renderFerien() {
   ut();
 }
 
-function countDaysFromEnts(list) {
-  var t = 0;
-  for (var i = 0; i < list.length; i++) {
-    var e = list[i];
-    if (e.f && e.t) { var f = new Date(e.f), to = new Date(e.t); if (to >= f) t += cwd(f, to); }
-    else if (e.f) { var d = new Date(e.f); if (isWD(d)) t++; }
-  }
-  return t;
+// Anzahl Arbeitstage einer Liste (jeder Tag nur einmal, auch bei ueberlappenden Eintraegen)
+function countDaysFromEnts(list) { return keys(analyzeEntries(list).wd).length; }
+
+function currentStichtag() {
+  var el = document.getElementById("stichtag");
+  var x = el ? toISO(el.value) : "";
+  return parseISO(x) ? x : yesterdayISO();
+}
+
+// Doppelt gebuchte Arbeitstage (Ferien+Kompensation oder ueberlappende Eintraege)
+function findDoubleBookings() {
+  var k = analyzeEntries(kompEnts), f = analyzeEntries(ferienEnts), both = {};
+  for (var s in k.wd) if (f.wd[s]) both[s] = true;
+  return { both: keys(both), komp: keys(k.dupes), ferien: keys(f.dupes) };
+}
+
+function listCH(a) {
+  var out = []; for (var i = 0; i < a.length && i < 8; i++) out.push(toCH(a[i]));
+  return out.join(", ") + (a.length > 8 ? " (+" + (a.length - 8) + " weitere)" : "");
 }
 
 function ut() {
-  var kd = countDaysFromEnts(kompEnts), kt = kd * VAC;
-  document.getElementById("ktotal").textContent = kd > 0 ? "Total: " + fm(kt) + " (" + kd + " Tage)" : "";
-  var fd = countDaysFromEnts(ferienEnts);
-  document.getElementById("ftotal").textContent = fd > 0 ? fd + " Arbeitstage eingetragen" : "";
+  var x = currentStichtag();
+  var k = analyzeEntries(kompEnts), kp = 0, kf = 0, kmin = 0;
+  for (var s in k.wd) { kmin += sollMin(s); if (s <= x) kp++; else kf++; }
+  document.getElementById("ktotal").textContent = (kp + kf) > 0
+    ? "Total: " + fm(kmin) + " (" + (kp + kf) + " Tage: " + kp + " bezogen, " + kf + " geplant)" : "";
+
+  var f = analyzeEntries(ferienEnts), fp = 0, ff = 0;
+  for (var t in f.wd) { if (k.wd[t]) continue; if (t <= x) fp++; else ff++; }  // Konflikttage zaehlen als Kompensation
+  document.getElementById("ftotal").textContent = (fp + ff) > 0
+    ? (fp + ff) + " Arbeitstage eingetragen (" + fp + " bezogen, " + ff + " geplant) von " + FERIEN_ANSPRUCH : "";
+
+  var db = findDoubleBookings(), msg = [];
+  if (db.both.length)   msg.push("Ferien und Kompensation am selben Tag: " + listCH(db.both) + ". Gerechnet wird als Kompensation.");
+  if (db.komp.length)   msg.push("Kompensation mehrfach eingetragen: " + listCH(db.komp) + ". Wird nur einmal gezaehlt.");
+  if (db.ferien.length) msg.push("Ferien mehrfach eingetragen: " + listCH(db.ferien) + ". Wird nur einmal gezaehlt.");
+  var w = document.getElementById("dblWarn");
+  w.innerHTML = "";
+  for (var i = 0; i < msg.length; i++) { var p = document.createElement("div"); p.textContent = msg[i]; w.appendChild(p); }
+  w.style.display = msg.length ? "block" : "none";
+
   buildCalendar();
 }

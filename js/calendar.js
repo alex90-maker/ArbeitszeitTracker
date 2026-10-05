@@ -1,6 +1,9 @@
 function buildCalendar() {
   var kd = getDaysSet(kompEnts);
   var fd = getDaysSet(ferienEnts);
+  var db = findDoubleBookings(), conflict = {};
+  var all = db.both.concat(db.komp, db.ferien);
+  for (var c = 0; c < all.length; c++) conflict[all[c]] = true;
   var today = ds(new Date());
   var grid = document.getElementById("calGrid"); grid.innerHTML = "";
 
@@ -31,6 +34,7 @@ function buildCalendar() {
       else if (fd[dateStr])  { cell.className += " vacation";     tip = "Ferien"; }
       else if (PRE[dateStr]) { cell.className += " prefeiertag";  tip = PRE[dateStr]; }
       else                   { cell.className += " workday"; }
+      if (conflict[dateStr]) { cell.className += " conflict"; tip = "Doppelt gebucht"; }
       if (dateStr === today) cell.className += " today";
       cell.textContent = day;
       if (tip) cell.title = tip;

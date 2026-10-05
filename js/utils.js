@@ -1,7 +1,17 @@
 function p2(n) { return n < 10 ? "0" + n : "" + n; }
 
+// Date -> "YYYY-MM-DD" (lokale Zeit)
 function ds(d) {
   return d.getFullYear() + "-" + p2(d.getMonth()+1) + "-" + p2(d.getDate());
+}
+
+// "YYYY-MM-DD" -> Date in lokaler Zeit (00:00). null bei ungueltiger Eingabe.
+// Bewusst nicht new Date("YYYY-MM-DD"), weil das als UTC interpretiert wird.
+function parseISO(s) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+  if (!m) return null;
+  var d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return ds(d) === s ? d : null;
 }
 
 function iw(d) { return d.getDay() === 0 || d.getDay() === 6; }
@@ -12,6 +22,14 @@ function ih(s) {
 }
 
 function isWD(d) { return !iw(d) && !ih(ds(d)); }
+
+// Sollzeit (90%) eines Arbeitstags in Minuten; an Vorfeiertagen reduziert.
+function sollMin(s) { return PRE[s] ? VAC_PRE : VAC; }
+
+function addDays(d, n) { var r = new Date(d.getFullYear(), d.getMonth(), d.getDate()); r.setDate(r.getDate() + n); return r; }
+
+// Gestern als ISO (Default-Stichtag des Saldos)
+function yesterdayISO(now) { return ds(addDays(now || new Date(), -1)); }
 
 function toISO(s) {
   s = (s || "").trim(); if (!s) return "";
@@ -54,24 +72,46 @@ function fm(x) {
   return (neg ? "-" : "") + Math.floor(a / 60) + "h " + p2(a % 60) + "min";
 }
 
+// Zahl mit einer Nachkommastelle
+function f1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
+
+// Anzahl Arbeitstage im Bereich [f, t] (Date-Objekte, inklusive)
 function cwd(f, t) {
-  var n = 0, d = new Date(f), e = new Date(t);
-  e.setHours(23, 59, 59, 999);
-  while (d <= e) { if (isWD(d)) n++; d.setDate(d.getDate()+1); }
+  var n = 0, d = addDays(f, 0);
+  while (d <= t) { if (isWD(d)) n++; d = addDays(d, 1); }
   return n;
 }
 
+// Alle Kalendertage einer Eintragsliste als Set { "YYYY-MM-DD": true }.
+// Eintrag: { f, t } (Bereich) oder nur { f } (einzelner Tag).
 function getDaysSet(list) {
-  var days = {};
+  return analyzeEntries(list).days;
+}
+
+// Wertet eine Eintragsliste aus:
+//  days:  alle Kalendertage (Set)
+//  wd:    nur Arbeitstage (Set) - nur diese zaehlen in der Berechnung
+//  dupes: Arbeitstage, die durch mehrere Eintraege der Liste abgedeckt sind
+function analyzeEntries(list) {
+  var days = {}, wd = {}, seen = {}, dupes = {};
   for (var i = 0; i < list.length; i++) {
     var e = list[i];
-    if (e.f && e.t) {
-      var d = new Date(e.f), to = new Date(e.t); to.setHours(23,59,59,999);
-      while (d <= to) { days[ds(d)] = true; d.setDate(d.getDate()+1); }
-    } else if (e.f) { days[e.f] = true; }
+    var f = parseISO(e.f); if (!f) continue;
+    var t = e.t ? parseISO(e.t) : f; if (!t || t < f) continue;
+    var own = {};
+    for (var d = f; d <= t; d = addDays(d, 1)) {
+      var s = ds(d);
+      if (own[s]) continue; own[s] = true;
+      days[s] = true;
+      if (!isWD(d)) continue;
+      if (seen[s]) dupes[s] = true;
+      seen[s] = true; wd[s] = true;
+    }
   }
-  return days;
+  return { days: days, wd: wd, dupes: dupes };
 }
+
+function keys(o) { var a = []; for (var k in o) if (o.hasOwnProperty(k)) a.push(k); return a.sort(); }
 
 function showNotice(m) {
   var el = document.getElementById("notice");

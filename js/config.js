@@ -1,10 +1,17 @@
-var VAC = 454;
-var OTP = 50;
-var YR = 2026;
+// ===== Grundparameter (siehe README.md, Abschnitt "Berechnungsmodell") =====
+var YR = 2026;                // Berechnungsjahr
+var VAC = 454;                // Sollzeit pro Arbeitstag bei 90% in Minuten (7h34)
+var VAC_PRE = 400;            // Sollzeit an Vorfeiertagen bei 90% in Minuten (6h40)
+var OTP = 50;                 // geplante Ueberzeit pro gearbeitetem Tag in Minuten
+var FERIEN_ANSPRUCH = 25;     // Ferienanspruch pro Jahr in Tagen
+var ZIEL_TAGE = 50;           // Ziel: Abwesenheit total (Ferien + Kompensation) in Tagen = 10 Wochen
+
+// Laufzeitzustand
 var TWD = 0;
 var kompEnts = [];
 var ferienEnts = [];
 
+// Feiertage Kanton Zug 2026
 var H = [
   "2026-01-01","2026-01-02","2026-04-03","2026-04-06",
   "2026-05-14","2026-05-25","2026-06-04","2026-08-01",
@@ -21,6 +28,8 @@ var HNAMES = {
   "2026-12-26":"Stephanstag"
 };
 
+// Vorfeiertage: reduzierte Sollzeit (VAC_PRE). Relevant fuer die Berechnung nur,
+// wenn an einem solchen Tag kompensiert wird (Kompensation kostet dann 6h40 statt 7h34).
 var PRE = {
   "2026-04-02":"Vorfeiertag Karfreitag",
   "2026-05-13":"Vorfeiertag Auffahrt",

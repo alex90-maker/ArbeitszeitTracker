@@ -9,15 +9,18 @@
 <body>
 <div class="wrap">
   <h1>Arbeitszeit-Tracker 2026</h1>
-  <p class="sub">90% Pensum &middot; 50 Min. Ueberzeit/Tag &middot; Ziel: 10 Wochen Urlaub</p>
+  <p class="sub">90% Pensum &middot; 50 Min. Ueberzeit/Tag &middot; 25 Tage Ferien &middot; Ziel: 10 Wochen Abwesenheit</p>
 
   <div class="main-grid">
     <!-- Linke Spalte -->
     <div>
       <div class="card">
         <label>Aktuelles Ueberzeitsaldo</label>
-        <input type="text" id="saldo" placeholder="z.B. 20:52">
+        <input type="text" id="saldo" placeholder="z.B. 20:52" oninput="document.getElementById('stichtag').value = toCH(yesterdayISO());">
         <p class="hint">Format HH:MM oder HH.MM &middot; Negativ mit - Zeichen</p>
+        <label for="stichtag" style="margin-top:12px">Saldo-Stand inkl. Tag</label>
+        <input type="text" id="stichtag" placeholder="dd.mm.yyyy" onblur="this.value = toCH(toISO(this.value)); ut();">
+        <p class="hint">Letzter Tag, der im Saldo enthalten ist (Standard: gestern). Ferien/Kompensation danach gelten als geplant.</p>
       </div>
 
       <div class="card">
@@ -35,6 +38,8 @@
         <button class="add-btn" type="button" onclick="addFerien()">+ Ferientag/-woche hinzufuegen</button>
         <div class="ftotal" id="ftotal"></div>
       </div>
+
+      <div class="warn-box" id="dblWarn" style="display:none"></div>
 
       <div class="btn-row">
         <button class="calc-btn" type="button" onclick="calculate()">Berechnen</button>
@@ -59,6 +64,7 @@
         <div class="leg"><div class="leg-dot" style="background:#fef9c3;border:1px solid #fde68a"></div> Ferien</div>
         <div class="leg"><div class="leg-dot" style="background:#dbeafe;border:1px solid #93c5fd"></div> Kompensation</div>
         <div class="leg"><div class="leg-dot" style="background:#f8fafc;border:1px solid #e2e8f0"></div> Wochenende</div>
+        <div class="leg"><div class="leg-dot" style="background:#fff;border:2px solid #dc2626"></div> Doppelt gebucht</div>
         <div class="leg"><div class="leg-dot" style="outline:2px solid #2563eb;outline-offset:-1px;background:#fff"></div> Heute</div>
       </div>
       <div class="months-grid" id="calGrid"></div>
