@@ -1,8 +1,9 @@
 # Arbeitszeit-Tracker 2026
 
-Statische Web-App (HTML/JS, kein Build, kein Server), die meine Überzeit gegen den Plan rechnet:
-**90 % Pensum, faktisch 100 % arbeiten → 50 Min. Überzeit pro Arbeitstag**, die als Kompensationstage bezogen werden.
-Ziel: zusammen mit dem Ferienanspruch **10 Wochen (50 Tage) Abwesenheit** pro Jahr.
+Statische Web-App (HTML/JS, kein Build, kein Server) für meine Überzeit.
+**Ziel: 10 Wochen (50 Tage) Abwesenheit pro Jahr** = 25 Ferientage + 25 Kompensationstage.
+Ich bin mit 90 % angestellt und erarbeite die Kompensationstage durch tägliche Überzeit.
+Die App berechnet aus dem Ziel, **wie viel Überzeit pro Arbeitstag nötig ist**, und misst daran, ob ich im Plus oder Minus bin.
 
 Starten: `index.html` im Browser öffnen. Daten werden im URL-Hash gespeichert („Speichern“ → Lesezeichen).
 
@@ -13,9 +14,9 @@ Starten: `index.html` im Browser öffnen. Daten werden im URL-Hash gespeichert (
 | `YR` | 2026 | Berechnungsjahr |
 | `VAC` | 454 | Sollzeit/Tag bei 90 % in Min. (7h34 = 90 % von 8h24) |
 | `VAC_PRE` | 400 | Sollzeit an Vorfeiertagen bei 90 % (6h40) |
-| `OTP` | 50 | Geplante Überzeit pro gearbeitetem Tag in Min. |
 | `FERIEN_ANSPRUCH` | 25 | Ferientage pro Jahr |
 | `ZIEL_TAGE` | 50 | Ziel Abwesenheit (Ferien + Kompensation) in Tagen |
+| `OTP` | berechnet | Nötige Überzeit pro gearbeitetem Tag (siehe Jahresmodell) |
 | `H` / `PRE` | – | Feiertage bzw. Vorfeiertage Kanton Zug 2026 |
 
 ## Eingaben
@@ -29,51 +30,46 @@ Starten: `index.html` im Browser öffnen. Daten werden im URL-Hash gespeichert (
 
 Begriffe: AT = Arbeitstag, OT = Überzeit, Komp. = Kompensationstag.
 
-**1. Stand per Stichtag (Ist vs. Soll)**
+**1. Jahresmodell → nötige Überzeit pro Tag (`OTP`)**
+
+- Komp.-Tage für das Ziel = 50 − 25 Ferien = **25 Tage** → 25 × 7h34 = **189h10 OT**
+- Tage mit Überzeit = 252 AT − 50 Tage Abwesenheit = **202 AT**
+- **OTP = 189h10 ÷ 202 ≈ 56.2 Min. pro gearbeitetem Tag**
+
+Ändern sich Ferienanspruch, Ziel oder Feiertage, rechnet sich `OTP` automatisch neu.
+Annahmen: Saldo am 1.1. = 0; Vorfeiertage nicht berücksichtigt (Komp. an einem Vorfeiertag kostet nur 6h40 → minimal Reserve).
+
+**2. Stand per Stichtag (Plus/Minus)**
 
 - Ist (brutto erarbeitete OT) = Saldo + Σ Sollzeit der *bezogenen* Komp.-Tage (7h34, an Vorfeiertagen 6h40)
-- Soll = (AT bis Stichtag − bezogene Ferientage − bezogene Komp.-Tage) × 50 Min.
+- Soll = (AT bis Stichtag − bezogene Ferientage − bezogene Komp.-Tage) × OTP
 - Differenz = Ist − Soll → Status „Über / Im / Unter Plan“ (Toleranz ±60 Min.)
 
 Geplante Einträge (nach dem Stichtag) beeinflussen diesen Teil nicht.
 
-**2. Hochrechnung bis 31.12.**
+**3. Hochrechnung bis 31.12.**
 
 - Verbleibende AT nach Stichtag − geplante Ferien − noch nicht geplanter Ferienanspruch − geplante Komp. = AT, die noch OT erzeugen
 - Annahme: Der restliche Ferienanspruch wird noch im Jahr bezogen (erzeugt also keine OT), auch wenn er noch nicht eingetragen ist.
-- Saldo 31.12. = Saldo + Zufluss (AT × 50 Min.) − Sollzeit der geplanten Komp.-Tage
-- Zusätzlich kompensierbar = Saldo 31.12. ÷ (7h34 + 50 Min.), abgerundet auf halbe Tage.
-  Ein zusätzlicher Komp.-Tag kostet 7h34 und erzeugt an dem Tag keine 50 Min.
+- Saldo 31.12. = Saldo + Zufluss (AT × OTP) − Sollzeit der geplanten Komp.-Tage
+- Zusätzlich kompensierbar = Saldo 31.12. ÷ (7h34 + OTP), abgerundet auf halbe Tage.
+  Ein zusätzlicher Komp.-Tag kostet 7h34 und erzeugt an dem Tag keine Überzeit.
 
-**3. Ziel 10 Wochen**
+**4. Ziel 10 Wochen (laufendes Jahr)**
 
 - Erreichbare Abwesenheit = Ferien (Anspruch) + Komp. bezogen + geplant + zusätzlich möglich
-- Nötige OT pro AT für das Ziel = (fehlende Komp.-Tage × 7h34 − (Saldo − geplante Komp.)) ÷ verbleibende AT mit OT
-
-**4. Jahresmodell (theoretisch, ab Saldo 0 am 1.1.)**
-
-Mit *k* = Komp.-Tage gilt: (252 − 25 − k) × 50 = k × 454 → **k = 227 × 50 / 504 ≈ 22.5 Tage**.
-
-| | Wert |
-|---|---|
-| Arbeitstage 2026 Kt. Zug | 252 |
-| Max. Komp.-Tage bei 50 Min./Tag | 22.5 |
-| Total Abwesenheit | 47.5 Tage ≈ 9.5 Wochen |
-| Fehlend zum Ziel (25 Komp.-Tage) | 2.5 Tage ≈ 20h50 OT |
-| Nötige OT/Tag für 10 Wochen | ≈ 56 Min. |
-
-→ **Mit 50 Min./Tag sind rund 9.5 statt 10 Wochen möglich** (ohne Übertrag aus dem Vorjahr).
-Eintritt 2026 (März) wird nicht modelliert; Jan/Feb sind manuell als Überzeit im Saldo erfasst.
-Das Modell ignoriert Vorfeiertage (Komp. an Vorfeiertagen kostet nur 6h40 → minimal mehr Spielraum).
+- Nötige OT pro AT ab Stichtag = (fehlende Komp.-Tage × 7h34 − (Saldo − geplante Komp.)) ÷ verbleibende AT mit OT.
+  Unterschied zu OTP: Dieser Wert berücksichtigt den aktuellen Rückstand bzw. Vorsprung („Aufholrate“).
 
 ## Vorfeiertage
 
-Die Sollzeit ist an Vorfeiertagen 6h40 statt 7h34. Für die OT-Erzeugung spielt das keine Rolle (es zählen weiterhin 50 Min. über Soll).
+Die Sollzeit ist an Vorfeiertagen 6h40 statt 7h34. Für die OT-Erzeugung spielt das keine Rolle (es zählt die Überzeit über Soll).
 Relevant ist es nur, wenn an einem Vorfeiertag **kompensiert** wird: Die Zeiterfassung zieht dann nur 6h40 ab, deshalb rechnet die App dort mit 6h40.
 
 ## Bekannte Einschränkungen / offene Punkte
 
-- **Übertrag aus dem Vorjahr** wird nicht berücksichtigt: Das Soll startet am 1.1. bei 0. Ein Übertrag im Saldo lässt den Stand zu gut aussehen. (bewusst zurückgestellt)
+- **Eintritt März 2026** wird nicht modelliert: Jan/Feb sind manuell als Überzeit im Saldo erfasst, damit das Soll ab 1.1. stimmt.
+- **Übertrag aus dem Vorjahr** wird nicht berücksichtigt: Das Soll startet am 1.1. bei 0. (bewusst zurückgestellt)
 - **Halbe Tage / Stunden-Kompensation** nicht erfassbar. (bewusst zurückgestellt)
 - Jahr und Feiertage sind fest auf 2026 codiert → für 2027 neu aufsetzen.
 - Vorfeiertags-Liste prüfen: `2026-12-30` ist als „Vorfeiertag Stephanstag“ beschriftet (Stephanstag = 26.12.); 31.07. und 14.08. sind Freitage vor Feiertagen, die auf Samstag fallen. Ob das bei WWZ als Vorfeiertag gilt, ist ungeklärt. Wirkt sich nur bei Kompensation an diesen Tagen aus (54 Min. pro Tag).
@@ -88,9 +84,15 @@ js/config.js        Parameter, Feiertage
 js/utils.js         Datums-/Zeit-Helfer, analyzeEntries()
 js/entries.js       Eingabelisten, Doppelbuchungs-Warnung
 js/calendar.js      Jahreskalender
-js/calculate.js     computeStatus(), computeYearModel() (rein) + Darstellung
+js/calculate.js     computeYearModel(), computeStatus() (rein) + Darstellung
 js/storage.js       Speichern/Laden über URL-Hash
 tests/calc.test.js  Tests der Rechenlogik: node tests/calc.test.js
 ```
+
+## Deployment
+
+Kein Build-Schritt: Die Dateien werden so ausgeliefert, wie sie im Repo liegen.
+Lokal: `index.html` öffnen. Mit GitHub Pages: Nach dem Push auf den Pages-Branch wird die Seite automatisch neu veröffentlicht (ca. 1 Min.).
+Gespeicherte Links (URL-Hash) bleiben kompatibel; alte Links ohne Stichtag laden mit Stichtag = gestern.
 
 Siehe `WORKLOG.md` für Änderungen und Entscheide.

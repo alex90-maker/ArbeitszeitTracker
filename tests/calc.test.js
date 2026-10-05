@@ -11,12 +11,14 @@ function near(a, b, eps) { assert.ok(Math.abs(a - b) <= (eps || 1e-6), a + " != 
 
 t("252 Arbeitstage 2026 Kt. Zug", function () { assert.strictEqual(ctx.TWD, 252); });
 
-t("Jahresmodell: max. Komp.-Tage bei 50 Min./Tag", function () {
+t("Jahresmodell: noetige OT/Tag fuer 10 Wochen", function () {
   var y = ctx.computeYearModel();
-  near(y.kMax, 227 * 50 / 504);              // 22.52
-  near(y.total, 25 + 227 * 50 / 504);        // 47.52 Tage
-  near(y.lueckeMin, 25 * 454 - 202 * 50);    // 1250 Min = 20h50
-  near(y.otProTagFuerZiel, 25 * 454 / 202);  // 56.2 Min
+  near(y.zielKomp, 25);
+  near(y.arbeitstage, 202);
+  near(y.otp, 25 * 454 / 202);               // 56.19 Min
+  near(ctx.OTP, y.otp);
+  // Gegenprobe: an 202 AT erzeugte OT deckt genau 25 Komp.-Tage
+  near(202 * ctx.OTP, 25 * 454);
 });
 
 var base = { saldo: 1252, stichtag: "2026-10-02", komp: [], ferien: [] };
@@ -52,15 +54,15 @@ t("Hochrechnung: Ferienanspruch und geplante Tage erzeugen keine OT (Fehler 2)",
   assert.strictEqual(r.remAT, rem);
   near(r.ferRest, 15);
   near(r.arbFut, rem - 15);
-  near(r.saldoEnd, 1252 + (rem - 15) * 50);
+  near(r.saldoEnd, 1252 + (rem - 15) * ctx.OTP);
   var a = st({ ferien: [{ f: "2026-02-02", t: "2026-02-13" }, { f: "2026-11-16", t: "2026-11-20" }] });
   near(a.saldoEnd, r.saldoEnd); // geplante Ferien innerhalb des Anspruchs: gleiche Hochrechnung
   near(a.ferRest, 10);
 });
 
-t("Zusaetzliche Komp.-Tage: Kosten 7h34 + 50 Min", function () {
+t("Zusaetzliche Komp.-Tage: Kosten 7h34 + OT/Tag", function () {
   var r = st({});
-  near(r.kAdd, Math.floor(r.saldoEnd / 504 * 2) / 2);
+  near(r.kAdd, Math.floor(r.saldoEnd / (454 + ctx.OTP) * 2) / 2);
 });
 
 t("Ueberlappung Ferien/Komp. wird nur einmal abgezogen (Fehler 3)", function () {

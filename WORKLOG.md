@@ -2,6 +2,16 @@
 
 Neueste Einträge oben. Pro Eintrag: was geändert wurde, warum, und offene Punkte.
 
+## 2026-10-05 – Überzeit pro Tag aus dem 10-Wochen-Ziel berechnet
+
+- Logik umgedreht: Statt fixer 50 Min./Tag wird die nötige Überzeit aus dem Ziel berechnet: `OTP = (ZIEL_TAGE − FERIEN_ANSPRUCH) × 7h34 ÷ (Arbeitstage − ZIEL_TAGE)` = 25 × 454 ÷ 202 ≈ **56.2 Min./Tag**.
+  *Warum:* Das Ziel (10 Wochen) ist die feste Grösse, die Überzeit die abgeleitete. Bei Änderung von Ferienanspruch, Ziel oder Feiertagen passt sich der Wert automatisch an.
+- Soll, Status (Plus/Minus) und Hochrechnung rechnen mit diesem Wert. Untertitel zeigt ihn dynamisch.
+- Jahresmodell-Karte zeigt jetzt die Herleitung statt „was ist mit 50 Min. möglich“.
+- Zusätzlich bleibt die „Aufholrate“ ab Stichtag (berücksichtigt aktuellen Rückstand/Vorsprung).
+- `OTP` in `config.js` ist kein Parameter mehr, sondern wird in `initTWD()` gesetzt. Tests angepasst (inkl. Gegenprobe 202 × OTP = 25 × 7h34).
+- README um Abschnitt Deployment ergänzt.
+
 ## 2026-10-05 – Ferienanspruch 25 Tage
 
 - `FERIEN_ANSPRUCH` von 22.5 auf 25 Tage korrigiert (Angabe Alex).

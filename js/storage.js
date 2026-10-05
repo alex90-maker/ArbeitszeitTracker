@@ -23,6 +23,7 @@ function copyLink() {
 
 function loadFromHash() {
   initTWD();
+  document.getElementById("otpInfo").textContent = f1(OTP);
   var hash = window.location.hash.replace("#", "");
   document.getElementById("stichtag").value = toCH(yesterdayISO());
   if (!hash) { ut(); return; }

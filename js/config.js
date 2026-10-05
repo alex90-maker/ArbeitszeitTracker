@@ -2,7 +2,7 @@
 var YR = 2026;                // Berechnungsjahr
 var VAC = 454;                // Sollzeit pro Arbeitstag bei 90% in Minuten (7h34)
 var VAC_PRE = 400;            // Sollzeit an Vorfeiertagen bei 90% in Minuten (6h40)
-var OTP = 50;                 // geplante Ueberzeit pro gearbeitetem Tag in Minuten
+var OTP = 0;                  // noetige Ueberzeit pro gearbeitetem Tag in Min. - wird aus dem Ziel berechnet (initTWD)
 var FERIEN_ANSPRUCH = 25;     // Ferienanspruch pro Jahr in Tagen
 var ZIEL_TAGE = 50;           // Ziel: Abwesenheit total (Ferien + Kompensation) in Tagen = 10 Wochen
 
