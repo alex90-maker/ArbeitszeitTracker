@@ -48,9 +48,6 @@ function renderFerien() {
   ut();
 }
 
-// Anzahl Arbeitstage einer Liste (jeder Tag nur einmal, auch bei ueberlappenden Eintraegen)
-function countDaysFromEnts(list) { return keys(analyzeEntries(list).wd).length; }
-
 function currentStichtag() {
   var el = document.getElementById("stichtag");
   var x = el ? toISO(el.value) : "";

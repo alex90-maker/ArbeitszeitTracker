@@ -2,6 +2,15 @@
 
 Neueste Einträge oben. Pro Eintrag: was geändert wurde, warum, und offene Punkte.
 
+## 2026-10-05 – Tests ergänzt, Nachrechnung, Vorschau 2027
+
+- Selbstbestätigenden Test (Formel mit sich selbst verglichen) durch ein von Hand nachgerechnetes Beispiel ersetzt (Saldo 20h52, Stichtag 02.10. → 62 AT, 37 AT mit OT, Saldo 31.12. 55h31, 6.5 Zusatztage).
+- Neue Tests: negativer Saldo 31.12., Obergrenze Zusatztage, Ziel nicht erreichbar, Zeit-/Datumsformate.
+- Neue Gegenprobe: unabhängige Tag-für-Tag-Simulation vs. `computeStatus` (300 Zufallsfälle im Test, separat 2000 Fälle geprüft): keine Abweichung bei Differenz, Saldo 31.12. und Zusatztagen.
+- Unbenutzte Funktionen `cwd()` und `countDaysFromEnts()` entfernt. 18 Tests.
+- Vorschau 2027 im README: 253 AT, OTP ≈ 55.9 Min./Tag.
+- Eintritt März ist mit dem Januar-Workaround erledigt (Angabe Alex) und betrifft nur 2026.
+
 ## 2026-10-05 – Review-Fixes: Enter-Taste, Texte aus Parametern, Stichtag-Anzeige
 
 - **Enter in einem Datumsfeld** rechnete mit dem alten Wert, weil Einträge erst beim Verlassen des Feldes (onblur) übernommen werden. Enter verlässt jetzt zuerst das aktive Feld, dann wird gerechnet.

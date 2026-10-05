@@ -60,9 +60,90 @@ t("Hochrechnung: Ferienanspruch und geplante Tage erzeugen keine OT (Fehler 2)",
   near(a.ferRest, 10);
 });
 
-t("Zusaetzliche Komp.-Tage: Kosten 7h34 + OT/Tag", function () {
+t("Hochrechnung von Hand nachgerechnet (Saldo 20h52, Stichtag 02.10., keine Eintraege)", function () {
+  // Verbleibende AT: Okt 20 + Nov 21 + Dez 21 (ohne 08.12./25.12.) = 62
+  // - 25 Ferien (noch nicht eingetragen) = 37 AT mit OT
+  // Saldo 31.12. = 1252 + 37 x 56.19 = 3330.96 Min (55h31)
+  // Zusaetzliche Komp.: 3330.96 / (454 + 56.19) = 6.53 -> 6.5 Tage (halbe Tage abgerundet)
   var r = st({});
-  near(r.kAdd, Math.floor(r.saldoEnd / (454 + ctx.OTP) * 2) / 2);
+  assert.strictEqual(r.remAT, 62);
+  near(r.ferRest, 25);
+  near(r.arbFut, 37);
+  near(r.saldoEnd, 3330.96, 0.01);
+  near(r.kAdd, 6.5);
+  near(r.abwesenheit, 31.5);
+});
+
+t("Geplante Kompensation groesser als erwartete OT -> Saldo 31.12. negativ, keine Zusatztage", function () {
+  var r = st({ saldo: 0, komp: [{ f: "2026-10-05", t: "2026-11-27" }] });   // 40 AT geplant
+  assert.ok(r.saldoEnd < 0);
+  assert.strictEqual(r.kAdd, 0);
+});
+
+t("Zusaetzliche Komp.-Tage hoechstens so viele wie freie AT", function () {
+  var r = st({ saldo: 100000 });
+  near(r.kAdd, r.arbFut);
+});
+
+t("Ziel nicht mehr erreichbar -> Aufholrate null", function () {
+  var r = st({ stichtag: "2026-12-29", ferien: [{ f: "2026-01-05", t: "2026-02-06" }] }); // 25 Ferien bezogen, 0 Komp.
+  assert.strictEqual(r.remAT, 2);
+  near(r.kompFehlend, 25);
+  assert.strictEqual(r.otProTagFuerZiel, null);
+});
+
+t("Eingaben: Zeit- und Datumsformate", function () {
+  assert.strictEqual(ctx.pt("20:52"), 1252);
+  assert.strictEqual(ctx.pt("20.52"), 1252);
+  assert.strictEqual(ctx.pt("-1:30"), -90);
+  assert.strictEqual(ctx.pt("abc"), null);
+  assert.strictEqual(ctx.pt(""), null);
+  assert.strictEqual(ctx.toISO("1.3.26"), "2026-03-01");
+  assert.strictEqual(ctx.toISO("01.03.2026"), "2026-03-01");
+  assert.strictEqual(ctx.toCH("2026-03-01"), "01.03.2026");
+  assert.strictEqual(ctx.fhm(454), "7h34");
+  assert.strictEqual(ctx.fhm(400), "6h40");
+});
+
+t("Gegenprobe: Tag-fuer-Tag-Simulation stimmt mit der Rechnung ueberein (300 Zufallsfaelle)", function () {
+  var days = [];
+  for (var d = new Date(2026, 0, 1); d.getFullYear() === 2026; d = ctx.addDays(d, 1)) if (ctx.isWD(d)) days.push(ctx.ds(d));
+  var seed = 7;
+  function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+  function entries(n) {
+    var a = [];
+    for (var i = 0; i < n; i++) { var s = Math.floor(rnd() * days.length); a.push({ f: days[s], t: days[Math.min(days.length - 1, s + Math.floor(rnd() * 7))] }); }
+    return a;
+  }
+  function set(list) {
+    var o = {};
+    list.forEach(function (e) { days.forEach(function (s) { if (s >= e.f && s <= e.t) o[s] = true; }); });
+    return o;
+  }
+  for (var k = 0; k < 300; k++) {
+    var komp = entries(Math.floor(rnd() * 5)), fer = entries(Math.floor(rnd() * 6));
+    var x = days[Math.floor(rnd() * days.length)], saldo = Math.round((rnd() - 0.3) * 6000);
+    var r = ctx.computeStatus({ saldo: saldo, stichtag: x, komp: komp, ferien: fer });
+    var K = set(komp), F = set(fer), ist = saldo, soll = 0, ferAll = 0;
+    days.forEach(function (s) {
+      var isK = !!K[s], isF = !isK && !!F[s];       // Konflikttag = Kompensation
+      if (isF) ferAll++;
+      if (s <= x) { if (isK) ist += ctx.sollMin(s); else if (!isF) soll += ctx.OTP; }
+    });
+    // Zukunft Tag fuer Tag: noch nicht eingetragene Ferien auf die ersten freien Tage legen
+    var rest = Math.max(0, ctx.FERIEN_ANSPRUCH - ferAll), bal = saldo, free = 0;
+    days.forEach(function (s) {
+      if (s <= x || F[s] && !K[s]) return;
+      if (K[s]) bal -= ctx.sollMin(s);
+      else if (rest > 0) rest--;
+      else { bal += ctx.OTP; free++; }
+    });
+    var add = 0;
+    while (add + 0.5 <= free && bal - (add + 0.5) * (454 + ctx.OTP) >= -1e-9) add += 0.5;
+    near(r.diff, ist - soll, 1e-6);
+    near(r.saldoEnd, bal, 1e-6);
+    near(r.kAdd, add);
+  }
 });
 
 t("Exakt im Plan -> Hochrechnung ergibt genau das Ziel (50 Tage)", function () {

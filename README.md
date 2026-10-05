@@ -72,10 +72,20 @@ Relevant ist es nur, wenn an einem Vorfeiertag **kompensiert** wird: Die Zeiterf
 - **Eintritt März 2026** wird nicht modelliert (siehe unten).
 - **Übertrag aus dem Vorjahr** wird nicht berücksichtigt: Das Soll startet am 1.1. bei 0. (bewusst zurückgestellt)
 - **Halbe Tage / Stunden-Kompensation** nicht erfassbar. (bewusst zurückgestellt)
-- Jahr und Feiertage sind fest auf 2026 codiert → für 2027 neu aufsetzen. Einträge ausserhalb von 2026 werden in der Berechnung ignoriert, in den Totalen unter den Eingabelisten aber mitgezählt (bewusst zurückgestellt).
+- Jahr und Feiertage sind fest auf 2026 codiert → für 2027 neu aufsetzen (siehe Abschnitt 2027). Einträge ausserhalb von 2026 werden in der Berechnung ignoriert, in den Totalen unter den Eingabelisten aber mitgezählt (bewusst zurückgestellt).
 - Eintritt März: Jan/Feb sind mit 4 Komp.- und 4 Ferientagen im Januar überbrückt. Diese Tage zählen in „Erreichbare Abwesenheit“ und im Ferienanspruch mit.
 - Vorfeiertags-Liste prüfen: `2026-12-30` ist als „Vorfeiertag Stephanstag“ beschriftet (Stephanstag = 26.12.); 31.07. und 14.08. sind Freitage vor Feiertagen, die auf Samstag fallen. Ob das bei WWZ als Vorfeiertag gilt, ist ungeklärt. Wirkt sich nur bei Kompensation an diesen Tagen aus (54 Min. pro Tag).
 - Bei Ferien und Kompensation am selben Tag wird gewarnt; gerechnet wird der Tag als Kompensation.
+
+## Vorschau 2027
+
+Für 2027 `YR`, `H`, `HNAMES` und `PRE` anpassen; `OTP` rechnet sich dann selbst. Erwartete Werte (Kt. Zug, gleiche Feiertage wie 2026):
+
+- Ostern 28.03.2027 → Karfreitag 26.03., Ostermontag 29.03., Auffahrt 06.05., Pfingstmontag 17.05., Fronleichnam 27.05.
+- Auf Wochenende: Berchtoldstag (Sa), 01.08. (So), 15.08. (So), 25.12. (Sa), 26.12. (So)
+- 261 Wochentage − 8 Feiertage = **253 AT** (2026: 252) → 203 Tage mit OT
+- **OTP 2027 = 25 × 454 ÷ 203 ≈ 55.9 Min./Tag** (2026: 56.2)
+- Ein Übertrag aus 2026 ist darin nicht enthalten: je 1 h Übertrag sinkt der Bedarf um ≈ 0.3 Min./Tag (60 ÷ 203).
 
 ## Struktur
 
@@ -88,7 +98,7 @@ js/entries.js       Eingabelisten, Doppelbuchungs-Warnung
 js/calendar.js      Jahreskalender
 js/calculate.js     computeYearModel(), computeStatus() (rein) + Darstellung
 js/storage.js       Speichern/Laden über URL-Hash
-tests/calc.test.js  Tests der Rechenlogik: node tests/calc.test.js
+tests/calc.test.js  Tests der Rechenlogik inkl. Tag-für-Tag-Gegenprobe: node tests/calc.test.js
 ```
 
 ## Deployment
