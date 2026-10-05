@@ -72,15 +72,11 @@ function fm(x) {
   return (neg ? "-" : "") + Math.floor(a / 60) + "h " + p2(a % 60) + "min";
 }
 
+// Minuten kurz als "7h34" (fuer Beschriftungen)
+function fhm(x) { var a = Math.round(x); return Math.floor(a / 60) + "h" + p2(a % 60); }
+
 // Zahl mit einer Nachkommastelle
 function f1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
-
-// Anzahl Arbeitstage im Bereich [f, t] (Date-Objekte, inklusive)
-function cwd(f, t) {
-  var n = 0, d = addDays(f, 0);
-  while (d <= t) { if (isWD(d)) n++; d = addDays(d, 1); }
-  return n;
-}
 
 // Alle Kalendertage einer Eintragsliste als Set { "YYYY-MM-DD": true }.
 // Eintrag: { f, t } (Bereich) oder nur { f } (einzelner Tag).

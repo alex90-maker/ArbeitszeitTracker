@@ -1,5 +1,6 @@
 // ===== Grundparameter (siehe README.md, Abschnitt "Berechnungsmodell") =====
 var YR = 2026;                // Berechnungsjahr
+var PENSUM = 90;              // Pensum in % (nur Anzeige - VAC/VAC_PRE muessen passend gesetzt sein)
 var VAC = 454;                // Sollzeit pro Arbeitstag bei 90% in Minuten (7h34)
 var VAC_PRE = 400;            // Sollzeit an Vorfeiertagen bei 90% in Minuten (6h40)
 var OTP = 0;                  // noetige Ueberzeit pro gearbeitetem Tag in Min. - wird aus dem Ziel berechnet (initTWD)

@@ -120,7 +120,7 @@ function calculate() {
 
   o.innerHTML = warn
     + "<div class='status-banner' style='background:" + co + "'><div class='status-title'>" + st + "</div><div class='status-advice'>" + av + "</div></div>"
-    + "<div class='white-card'><div class='wc-label'>Differenz zum Soll per " + toCH(x) + "</div><div class='diff-val' style='color:" + dc + "'>" + sg + fm(Math.abs(diff)) + "</div><div class='diff-sub'>ca. " + sg + dd + " Tage &agrave; 7h34</div></div>"
+    + "<div class='white-card'><div class='wc-label'>Differenz zum Soll per " + toCH(x) + "</div><div class='diff-val' style='color:" + dc + "'>" + sg + fm(Math.abs(diff)) + "</div><div class='diff-sub'>ca. " + sg + dd + " Tage &agrave; " + fhm(VAC) + "</div></div>"
     + card("Stand per " + toCH(x),
         rw("Vergangene AT (bis Stichtag)", r.elAT + " / " + TWD)
       + rw("Davon Ferientage", r.ferPast)
@@ -149,9 +149,9 @@ function calculate() {
       + rw("&minus; Ziel-Abwesenheit", ZIEL_TAGE + " Tage")
       + rw("= Tage mit Ueberzeit", y.arbeitstage)
       + rw("Komp.-Tage (Ziel " + ZIEL_TAGE + " &minus; Ferien " + FERIEN_ANSPRUCH + ")", f1(y.zielKomp))
-      + rw("Benoetigte OT (" + f1(y.zielKomp) + " &times; 7h34)", fm(y.otZiel))
+      + rw("Benoetigte OT (" + f1(y.zielKomp) + " &times; " + fhm(VAC) + ")", fm(y.otZiel))
       + big("Benoetigte Ueberzeit pro Arbeitstag", f1(y.otp) + " Min.", "#2563eb", fm(y.otZiel) + " &divide; " + y.arbeitstage + " AT &middot; Basis fuer Soll und Status"))
-    + "<div class='info-box'>Saldo = Stand inkl. Stichtag. Ist = Saldo + bezogene Komp.-Tage &times; Sollzeit (7h34, Vorfeiertag 6h40). "
+    + "<div class='info-box'>Saldo = Stand inkl. Stichtag. Ist = Saldo + bezogene Komp.-Tage &times; Sollzeit (" + fhm(VAC) + ", Vorfeiertag " + fhm(VAC_PRE) + "). "
     + "Soll = (AT bis Stichtag &minus; Ferien &minus; Komp.) &times; " + f1(OTP) + " Min. (aus Jahresziel berechnet). Eintraege nach dem Stichtag gelten als geplant. "
     + "Details: README.md</div>";
 }

@@ -8,15 +8,16 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Arbeitszeit-Tracker 2026</h1>
-  <p class="sub">90% Pensum &middot; <span id="otpInfo"></span> Min. Ueberzeit/Tag &middot; 25 Tage Ferien &middot; Ziel: 10 Wochen Abwesenheit</p>
+  <h1 id="appTitle">Arbeitszeit-Tracker 2026</h1>
+  <p class="sub" id="subInfo" style="margin-bottom:4px"></p>
+  <p class="sub" id="stichtagInfo"></p>
 
   <div class="main-grid">
     <!-- Linke Spalte -->
     <div>
       <div class="card">
         <label>Aktuelles Ueberzeitsaldo</label>
-        <input type="text" id="saldo" placeholder="z.B. 20:52" oninput="document.getElementById('stichtag').value = toCH(yesterdayISO());">
+        <input type="text" id="saldo" placeholder="z.B. 20:52" oninput="document.getElementById('stichtag').value = toCH(yesterdayISO()); ut();">
         <p class="hint">Format HH:MM oder HH.MM &middot; Negativ mit - Zeichen</p>
         <label for="stichtag" style="margin-top:12px">Saldo-Stand inkl. Tag</label>
         <input type="text" id="stichtag" placeholder="dd.mm.yyyy" onblur="this.value = toCH(toISO(this.value)); ut();">
@@ -56,7 +57,7 @@
 
     <!-- Rechte Spalte: Kalender -->
     <div class="cal-section">
-      <h2>Kalender 2026</h2>
+      <h2 id="calTitle">Kalender 2026</h2>
       <div class="cal-legend">
         <div class="leg"><div class="leg-dot" style="background:#f0fdf4;border:1px solid #86efac"></div> Arbeitstag</div>
         <div class="leg"><div class="leg-dot" style="background:#fef2f2;border:1px solid #fca5a5"></div> Feiertag</div>
@@ -80,7 +81,12 @@
 <script src="js/calculate.js"></script>
 <script src="js/storage.js"></script>
 <script>
-  document.addEventListener("keydown", function(e) { if (e.key === "Enter") calculate(); });
+  document.addEventListener("keydown", function(e) {
+    if (e.key !== "Enter") return;
+    // Erst das aktive Feld verlassen, damit dessen onblur die Eingabe uebernimmt
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    calculate();
+  });
   window.onload = loadFromHash;
 </script>
 </body>

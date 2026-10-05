@@ -48,9 +48,6 @@ function renderFerien() {
   ut();
 }
 
-// Anzahl Arbeitstage einer Liste (jeder Tag nur einmal, auch bei ueberlappenden Eintraegen)
-function countDaysFromEnts(list) { return keys(analyzeEntries(list).wd).length; }
-
 function currentStichtag() {
   var el = document.getElementById("stichtag");
   var x = el ? toISO(el.value) : "";
@@ -69,7 +66,26 @@ function listCH(a) {
   return out.join(", ") + (a.length > 8 ? " (+" + (a.length - 8) + " weitere)" : "");
 }
 
+// Titel und Untertitel aus den Parametern (config.js)
+function renderStaticTexts() {
+  var t = "Arbeitszeit-Tracker " + YR;
+  document.title = t;
+  document.getElementById("appTitle").textContent = t;
+  document.getElementById("calTitle").textContent = "Kalender " + YR;
+  document.getElementById("subInfo").textContent = PENSUM + "% Pensum \u00b7 " + f1(OTP) + " Min. Ueberzeit/Tag \u00b7 "
+    + FERIEN_ANSPRUCH + " Tage Ferien \u00b7 Ziel: " + ZIEL_TAGE / 5 + " Wochen Abwesenheit";
+}
+
+// Zeigt unter dem Titel, auf welchen Stichtag sich der Saldo bezieht
+function renderStichtagInfo() {
+  var el = document.getElementById("stichtag"), info = document.getElementById("stichtagInfo");
+  var x = toISO(el.value);
+  if (parseISO(x)) { info.textContent = "Saldo-Stand per " + toCH(x) + " (inkl.)"; info.style.color = ""; }
+  else { info.textContent = "Stichtag ungueltig - gerechnet wird mit gestern (" + toCH(yesterdayISO()) + ")"; info.style.color = "#dc2626"; }
+}
+
 function ut() {
+  renderStichtagInfo();
   var x = currentStichtag();
   var k = analyzeEntries(kompEnts), kp = 0, kf = 0, kmin = 0;
   for (var s in k.wd) { kmin += sollMin(s); if (s <= x) kp++; else kf++; }

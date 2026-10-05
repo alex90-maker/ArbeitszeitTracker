@@ -2,6 +2,23 @@
 
 Neueste Einträge oben. Pro Eintrag: was geändert wurde, warum, und offene Punkte.
 
+## 2026-10-05 – Tests ergänzt, Nachrechnung, Vorschau 2027
+
+- Selbstbestätigenden Test (Formel mit sich selbst verglichen) durch ein von Hand nachgerechnetes Beispiel ersetzt (Saldo 20h52, Stichtag 02.10. → 62 AT, 37 AT mit OT, Saldo 31.12. 55h31, 6.5 Zusatztage).
+- Neue Tests: negativer Saldo 31.12., Obergrenze Zusatztage, Ziel nicht erreichbar, Zeit-/Datumsformate.
+- Neue Gegenprobe: unabhängige Tag-für-Tag-Simulation vs. `computeStatus` (300 Zufallsfälle im Test, separat 2000 Fälle geprüft): keine Abweichung bei Differenz, Saldo 31.12. und Zusatztagen.
+- Unbenutzte Funktionen `cwd()` und `countDaysFromEnts()` entfernt. 18 Tests.
+- Vorschau 2027 im README: 253 AT, OTP ≈ 55.9 Min./Tag.
+- Eintritt März ist mit dem Januar-Workaround erledigt (Angabe Alex) und betrifft nur 2026.
+
+## 2026-10-05 – Review-Fixes: Enter-Taste, Texte aus Parametern, Stichtag-Anzeige
+
+- **Enter in einem Datumsfeld** rechnete mit dem alten Wert, weil Einträge erst beim Verlassen des Feldes (onblur) übernommen werden. Enter verlässt jetzt zuerst das aktive Feld, dann wird gerechnet.
+- **Fest codierte Texte** durch Parameter ersetzt: Titel, Untertitel (Pensum, OT/Tag, Ferien, Ziel), „Kalender YR“ und die Sollzeiten (7h34 / 6h40) in den Ergebnissen. Neuer Anzeige-Parameter `PENSUM`, neuer Helfer `fhm()` („7h34“).
+- **Stichtag unter dem Titel**: „Saldo-Stand per …“, aktualisiert bei jeder Änderung (auch beim Tippen des Saldos). Ungültiger Stichtag wird rot gemeldet statt still auf gestern zu fallen.
+- **Tests**: neuer Test „Exakt im Plan → Hochrechnung ergibt genau 50 Tage, Aufholrate = Planrate“ (Kerneigenschaft des Modells). Notizkommentar im Hochrechnungs-Test bereinigt. 13 Tests.
+- Entscheid: Eintritt März bleibt unmodelliert; Jan/Feb sind mit 4 Komp.- und 4 Ferientagen im Januar überbrückt (Angabe Alex). Einträge ausserhalb 2026 und halbe Tage in „zusätzlich kompensierbar“ vorerst unverändert.
+
 ## 2026-10-05 – Überzeit pro Tag aus dem 10-Wochen-Ziel berechnet
 
 - Logik umgedreht: Statt fixer 50 Min./Tag wird die nötige Überzeit aus dem Ziel berechnet: `OTP = (ZIEL_TAGE − FERIEN_ANSPRUCH) × 7h34 ÷ (Arbeitstage − ZIEL_TAGE)` = 25 × 454 ÷ 202 ≈ **56.2 Min./Tag**.
