@@ -49,7 +49,7 @@ t("Kompensation an Vorfeiertag kostet 6h40", function () {
 
 t("Hochrechnung: Ferienanspruch und geplante Tage erzeugen keine OT (Fehler 2)", function () {
   var r = st({ ferien: [{ f: "2026-02-02", t: "2026-02-13" }] }); // 10 Tage bezogen
-  // Nach 02.10.: Okt 21 AT (05.-30.10. = 20 + 0?) -> direkt nachzaehlen
+  // Verbleibende AT nach dem Stichtag 02.10. direkt nachzaehlen
   var rem = 0; for (var d = new Date(2026, 9, 3); d.getFullYear() === 2026; d = ctx.addDays(d, 1)) if (ctx.isWD(d)) rem++;
   assert.strictEqual(r.remAT, rem);
   near(r.ferRest, 15);
@@ -63,6 +63,19 @@ t("Hochrechnung: Ferienanspruch und geplante Tage erzeugen keine OT (Fehler 2)",
 t("Zusaetzliche Komp.-Tage: Kosten 7h34 + OT/Tag", function () {
   var r = st({});
   near(r.kAdd, Math.floor(r.saldoEnd / (454 + ctx.OTP) * 2) / 2);
+});
+
+t("Exakt im Plan -> Hochrechnung ergibt genau das Ziel (50 Tage)", function () {
+  // Bezogen: 5 Ferien, 3 Komp. (keine Vorfeiertage). Saldo so gewaehlt, dass Differenz = 0.
+  var o = { stichtag: "2026-06-30", komp: [{ f: "2026-03-10", t: "2026-03-12" }], ferien: [{ f: "2026-02-16", t: "2026-02-20" }] };
+  var r0 = ctx.computeStatus(Object.assign({}, o, { saldo: 0 }));
+  var saldo = r0.otS - r0.kompPastMin;
+  var r = ctx.computeStatus(Object.assign({}, o, { saldo: saldo }));
+  near(r.diff, 0);
+  // Ungerundet: Ferien + Komp. bezogen/geplant + zusaetzlich moegliche Komp. = Ziel
+  near(r.ferJahr + r.kompPast + r.kompFut + r.saldoEnd / (454 + ctx.OTP), ctx.ZIEL_TAGE);
+  assert.ok(r.abwesenheit <= ctx.ZIEL_TAGE && r.abwesenheit > ctx.ZIEL_TAGE - 0.5); // kAdd auf halbe Tage abgerundet
+  near(r.otProTagFuerZiel, ctx.OTP);   // Aufholrate = Planrate
 });
 
 t("Ueberlappung Ferien/Komp. wird nur einmal abgezogen (Fehler 3)", function () {

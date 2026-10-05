@@ -2,6 +2,14 @@
 
 Neueste Einträge oben. Pro Eintrag: was geändert wurde, warum, und offene Punkte.
 
+## 2026-10-05 – Review-Fixes: Enter-Taste, Texte aus Parametern, Stichtag-Anzeige
+
+- **Enter in einem Datumsfeld** rechnete mit dem alten Wert, weil Einträge erst beim Verlassen des Feldes (onblur) übernommen werden. Enter verlässt jetzt zuerst das aktive Feld, dann wird gerechnet.
+- **Fest codierte Texte** durch Parameter ersetzt: Titel, Untertitel (Pensum, OT/Tag, Ferien, Ziel), „Kalender YR“ und die Sollzeiten (7h34 / 6h40) in den Ergebnissen. Neuer Anzeige-Parameter `PENSUM`, neuer Helfer `fhm()` („7h34“).
+- **Stichtag unter dem Titel**: „Saldo-Stand per …“, aktualisiert bei jeder Änderung (auch beim Tippen des Saldos). Ungültiger Stichtag wird rot gemeldet statt still auf gestern zu fallen.
+- **Tests**: neuer Test „Exakt im Plan → Hochrechnung ergibt genau 50 Tage, Aufholrate = Planrate“ (Kerneigenschaft des Modells). Notizkommentar im Hochrechnungs-Test bereinigt. 13 Tests.
+- Entscheid: Eintritt März bleibt unmodelliert; Jan/Feb sind mit 4 Komp.- und 4 Ferientagen im Januar überbrückt (Angabe Alex). Einträge ausserhalb 2026 und halbe Tage in „zusätzlich kompensierbar“ vorerst unverändert.
+
 ## 2026-10-05 – Überzeit pro Tag aus dem 10-Wochen-Ziel berechnet
 
 - Logik umgedreht: Statt fixer 50 Min./Tag wird die nötige Überzeit aus dem Ziel berechnet: `OTP = (ZIEL_TAGE − FERIEN_ANSPRUCH) × 7h34 ÷ (Arbeitstage − ZIEL_TAGE)` = 25 × 454 ÷ 202 ≈ **56.2 Min./Tag**.

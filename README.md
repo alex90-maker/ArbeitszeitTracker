@@ -12,6 +12,7 @@ Starten: `index.html` im Browser öffnen. Daten werden im URL-Hash gespeichert (
 | Variable | Wert | Bedeutung |
 |---|---|---|
 | `YR` | 2026 | Berechnungsjahr |
+| `PENSUM` | 90 | Pensum in % – nur Anzeige; `VAC`/`VAC_PRE` passend setzen |
 | `VAC` | 454 | Sollzeit/Tag bei 90 % in Min. (7h34 = 90 % von 8h24) |
 | `VAC_PRE` | 400 | Sollzeit an Vorfeiertagen bei 90 % (6h40) |
 | `FERIEN_ANSPRUCH` | 25 | Ferientage pro Jahr |
@@ -22,7 +23,7 @@ Starten: `index.html` im Browser öffnen. Daten werden im URL-Hash gespeichert (
 ## Eingaben
 
 - **Saldo**: Überzeitsaldo aus der Zeiterfassung (HH:MM, negativ mit `-`).
-- **Saldo-Stand inkl. Tag (Stichtag)**: letzter Tag, der im Saldo enthalten ist. Standard: gestern; wird beim Tippen eines neuen Saldos automatisch auf gestern gesetzt.
+- **Saldo-Stand inkl. Tag (Stichtag)**: letzter Tag, der im Saldo enthalten ist. Standard: gestern; wird beim Tippen eines neuen Saldos automatisch auf gestern gesetzt. Der aktuelle Stichtag wird unter dem Titel angezeigt (rot, falls ungültig).
 - **Kompensation / Ferien**: einzelne Tage oder Bereiche. Gezählt werden nur Arbeitstage (keine Wochenenden/Feiertage).
   Einträge **bis und mit Stichtag = bezogen**, **danach = geplant**.
 
@@ -68,10 +69,11 @@ Relevant ist es nur, wenn an einem Vorfeiertag **kompensiert** wird: Die Zeiterf
 
 ## Bekannte Einschränkungen / offene Punkte
 
-- **Eintritt März 2026** wird nicht modelliert: Jan/Feb sind manuell als Überzeit im Saldo erfasst, damit das Soll ab 1.1. stimmt.
+- **Eintritt März 2026** wird nicht modelliert (siehe unten).
 - **Übertrag aus dem Vorjahr** wird nicht berücksichtigt: Das Soll startet am 1.1. bei 0. (bewusst zurückgestellt)
 - **Halbe Tage / Stunden-Kompensation** nicht erfassbar. (bewusst zurückgestellt)
-- Jahr und Feiertage sind fest auf 2026 codiert → für 2027 neu aufsetzen.
+- Jahr und Feiertage sind fest auf 2026 codiert → für 2027 neu aufsetzen. Einträge ausserhalb von 2026 werden in der Berechnung ignoriert, in den Totalen unter den Eingabelisten aber mitgezählt (bewusst zurückgestellt).
+- Eintritt März: Jan/Feb sind mit 4 Komp.- und 4 Ferientagen im Januar überbrückt. Diese Tage zählen in „Erreichbare Abwesenheit“ und im Ferienanspruch mit.
 - Vorfeiertags-Liste prüfen: `2026-12-30` ist als „Vorfeiertag Stephanstag“ beschriftet (Stephanstag = 26.12.); 31.07. und 14.08. sind Freitage vor Feiertagen, die auf Samstag fallen. Ob das bei WWZ als Vorfeiertag gilt, ist ungeklärt. Wirkt sich nur bei Kompensation an diesen Tagen aus (54 Min. pro Tag).
 - Bei Ferien und Kompensation am selben Tag wird gewarnt; gerechnet wird der Tag als Kompensation.
 

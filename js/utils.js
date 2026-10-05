@@ -72,6 +72,9 @@ function fm(x) {
   return (neg ? "-" : "") + Math.floor(a / 60) + "h " + p2(a % 60) + "min";
 }
 
+// Minuten kurz als "7h34" (fuer Beschriftungen)
+function fhm(x) { var a = Math.round(x); return Math.floor(a / 60) + "h" + p2(a % 60); }
+
 // Zahl mit einer Nachkommastelle
 function f1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
 
