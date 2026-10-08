@@ -2,6 +2,12 @@
 
 Neueste Einträge oben. Pro Eintrag: was geändert wurde, warum, und offene Punkte.
 
+## 2026-10-08 – Stichtag beim Laden immer gestern
+
+- Der Stichtag wird nicht mehr im Link gespeichert/geladen. Beim Öffnen der Seite steht er immer auf gestern (Entscheid Alex).
+- *Bekannte Folge:* Wird der Saldo nach dem Öffnen nicht nachgeführt, zählt das Soll für die Tage seit dem letzten Saldo weiter (≈ 56 Min. pro AT) und der Status zeigt zu viel Minus. Hinweis bewusst nicht gewünscht.
+- Der Stichtag bleibt manuell änderbar (z. B. für einen älteren Saldo).
+
 ## 2026-10-05 – Tests ergänzt, Nachrechnung, Vorschau 2027
 
 - Selbstbestätigenden Test (Formel mit sich selbst verglichen) durch ein von Hand nachgerechnetes Beispiel ersetzt (Saldo 20h52, Stichtag 02.10. → 62 AT, 37 AT mit OT, Saldo 31.12. 55h31, 6.5 Zusatztage).

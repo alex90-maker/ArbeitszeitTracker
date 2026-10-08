@@ -23,7 +23,7 @@ Starten: `index.html` im Browser öffnen. Daten werden im URL-Hash gespeichert (
 ## Eingaben
 
 - **Saldo**: Überzeitsaldo aus der Zeiterfassung (HH:MM, negativ mit `-`).
-- **Saldo-Stand inkl. Tag (Stichtag)**: letzter Tag, der im Saldo enthalten ist. Standard: gestern; wird beim Tippen eines neuen Saldos automatisch auf gestern gesetzt. Der aktuelle Stichtag wird unter dem Titel angezeigt (rot, falls ungültig).
+- **Saldo-Stand inkl. Tag (Stichtag)**: letzter Tag, der im Saldo enthalten ist. Wird beim Laden der Seite und beim Tippen eines neuen Saldos immer auf gestern gesetzt und nicht im Link gespeichert. **Saldo bei jedem Öffnen aktualisieren:** Ein alter Saldo mit neuem Stichtag zeigt pro nicht nachgeführtem Arbeitstag ≈ 56 Min. zu viel Minus. Der aktuelle Stichtag wird unter dem Titel angezeigt (rot, falls ungültig).
 - **Kompensation / Ferien**: einzelne Tage oder Bereiche. Gezählt werden nur Arbeitstage (keine Wochenenden/Feiertage).
   Einträge **bis und mit Stichtag = bezogen**, **danach = geplant**.
 
@@ -105,6 +105,6 @@ tests/calc.test.js  Tests der Rechenlogik inkl. Tag-für-Tag-Gegenprobe: node te
 
 Kein Build-Schritt: Die Dateien werden so ausgeliefert, wie sie im Repo liegen.
 Lokal: `index.html` öffnen. Mit GitHub Pages: Nach dem Push auf den Pages-Branch wird die Seite automatisch neu veröffentlicht (ca. 1 Min.).
-Gespeicherte Links (URL-Hash) bleiben kompatibel; alte Links ohne Stichtag laden mit Stichtag = gestern.
+Gespeicherte Links (URL-Hash) bleiben kompatibel; ein in älteren Links gespeicherter Stichtag wird ignoriert (Stichtag = gestern).
 
 Siehe `WORKLOG.md` für Änderungen und Entscheide.
