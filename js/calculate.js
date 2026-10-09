@@ -8,13 +8,19 @@ function initTWD() {
   OTP = computeYearModel().otp;
 }
 
+// Jahresziel setzen und die noetige Ueberzeit pro Tag (OTP) neu berechnen.
+function setZiel(ferien, komp) {
+  ZIEL_FERIEN = ferien; ZIEL_KOMP = komp;
+  OTP = computeYearModel().otp;
+}
+
 // Jahresmodell: Welche Ueberzeit pro gearbeitetem Tag braucht es fuer das Ziel?
-// Ziel ZIEL_TAGE Abwesenheit = FERIEN_ANSPRUCH + Kompensationstage.
-// Gearbeitet wird an TWD - ZIEL_TAGE Tagen; die dort erzeugte OT muss die
+// Ziel = ZIEL_FERIEN + ZIEL_KOMP Tage Abwesenheit.
+// Gearbeitet wird an TWD - Ziel Tagen; die dort erzeugte OT muss die
 // Kompensationstage (je VAC) decken. Annahmen: Saldo 1.1. = 0, Vorfeiertage nicht beruecksichtigt.
 function computeYearModel() {
-  var zielKomp = ZIEL_TAGE - FERIEN_ANSPRUCH;
-  var arbeitstage = TWD - ZIEL_TAGE;
+  var zielKomp = ZIEL_KOMP;
+  var arbeitstage = TWD - zielTage();
   var otZiel = zielKomp * VAC;
   return {
     twd: TWD,
@@ -61,9 +67,9 @@ function computeStatus(input) {
 
   // Hochrechnung ab Stichtag
   var ferEingetragen = r.ferPast + r.ferFut;
-  r.ferUeber = Math.max(0, ferEingetragen - FERIEN_ANSPRUCH);
+  r.ferUeber = Math.max(0, ferEingetragen - ZIEL_FERIEN);     // mehr Ferien eingetragen als im Ziel
   var frei = r.remAT - r.ferFut - r.kompFut;                    // noch unverplante Arbeitstage
-  r.ferRest = Math.min(Math.max(0, FERIEN_ANSPRUCH - ferEingetragen), Math.max(0, frei));
+  r.ferRest = Math.min(Math.max(0, ZIEL_FERIEN - ferEingetragen), Math.max(0, frei)); // Ferien laut Ziel, noch nicht eingetragen
   r.arbFut = Math.max(0, frei - r.ferRest);                     // Tage, die noch OT erzeugen (vor zusaetzlicher Komp.)
   r.zufluss = r.arbFut * OTP;
   r.saldoEnd = input.saldo + r.zufluss - r.kompFutMin;          // Saldo 31.12. ohne weitere Kompensation
@@ -74,11 +80,10 @@ function computeStatus(input) {
   r.abwesenheit = r.ferJahr + r.kompJahr;
 
   // Was braucht es ab jetzt fuer das Ziel?
-  var zielKomp = ZIEL_TAGE - r.ferJahr;
-  r.kompFehlend = Math.max(0, zielKomp - r.kompPast - r.kompFut);
-  var wRest = r.arbFut - r.kompFehlend;                         // Arbeitstage, die dann noch bleiben
-  var otBedarf = r.kompFehlend * VAC - (input.saldo - r.kompFutMin);
-  r.otProTagFuerZiel = wRest > 0 ? Math.max(0, otBedarf / wRest) : null;
+  r.kompFehlend = Math.max(0, ZIEL_KOMP - r.kompPast - r.kompFut);   // Komp.-Tage laut Ziel, noch nicht eingetragen
+  r.wRest = r.arbFut - r.kompFehlend;                           // Arbeitstage, die dann noch bleiben
+  r.otBedarf = r.kompFehlend * VAC - (input.saldo - r.kompFutMin);
+  r.otProTagFuerZiel = r.wRest > 0 ? Math.max(0, r.otBedarf / r.wRest) : null;
   return r;
 }
 
@@ -93,8 +98,9 @@ function calculate() {
   if (!parseISO(x)) { o.innerHTML = "<div class='error-box'>Bitte Stichtag des Saldos eingeben (dd.mm.yyyy)</div>"; return; }
   xe.value = toCH(x);
 
-  var r = computeStatus({ saldo: s, stichtag: x, komp: kompEnts, ferien: ferienEnts });
   var y = computeYearModel();
+  if (y.arbeitstage <= 0) { o.innerHTML = "<div class='error-box'>Ziel zu hoch: " + zielTage() + " Tage Abwesenheit bei " + TWD + " Arbeitstagen.</div>"; return; }
+  var r = computeStatus({ saldo: s, stichtag: x, komp: kompEnts, ferien: ferienEnts });
 
   var st, co, av, diff = r.diff;
   if (diff > 60)       { st = "Ueber Plan"; co = "#16a34a"; av = "Du koenntest weniger arbeiten oder mehr kompensieren."; }
@@ -113,10 +119,12 @@ function calculate() {
 
   var warn = "";
   if (r.saldoEnd < 0) warn += "<div class='warn-box'>Die geplante Kompensation uebersteigt die bis 31.12. erwartete Ueberzeit um " + fm(-r.saldoEnd) + ".</div>";
-  if (r.ferUeber > 0) warn += "<div class='warn-box'>Eingetragene Ferien (" + f1(r.ferPast + r.ferFut) + " Tage) uebersteigen den Anspruch von " + FERIEN_ANSPRUCH + " Tagen.</div>";
+  if (r.ferUeber > 0) warn += "<div class='warn-box'>Eingetragene Ferien (" + f1(r.ferPast + r.ferFut) + " Tage) uebersteigen dein Ferienziel von " + fd(ZIEL_FERIEN) + " Tagen.</div>";
 
-  var zielOk = r.abwesenheit >= ZIEL_TAGE;
-  var bedarf = r.otProTagFuerZiel === null ? "nicht mehr erreichbar" : Math.ceil(r.otProTagFuerZiel) + " Min./Tag";
+  var zt = zielTage(), wo = fd(zt / 5);
+  var zielOk = r.abwesenheit >= zt;
+  var bedarf = r.otProTagFuerZiel === null ? "nicht erreichbar" : Math.ceil(r.otProTagFuerZiel) + " Min.";
+  var gekauft = ZIEL_FERIEN - FERIEN_ANSPRUCH;
 
   o.innerHTML = warn
     + "<div class='status-banner' style='background:" + co + "'><div class='status-title'>" + st + "</div><div class='status-advice'>" + av + "</div></div>"
@@ -131,26 +139,29 @@ function calculate() {
         rw("Aktuelles Saldo", fm(s))
       + rw("Verbleibende AT nach Stichtag", r.remAT)
       + rw("&minus; geplante Ferien", r.ferFut)
-      + rw("&minus; noch nicht geplanter Ferienanspruch", f1(r.ferRest))
+      + rw("&minus; Ferien laut Ziel, noch nicht eingetragen", f1(r.ferRest))
       + rw("&minus; geplante Kompensation", r.kompFut + " Tage (" + fm(r.kompFutMin) + ")")
       + rw("= AT mit Ueberzeit", f1(r.arbFut))
       + rw("Zufluss " + f1(r.arbFut) + " AT &times; " + f1(OTP) + " Min", "+" + fm(r.zufluss))
       + rw("Saldo 31.12. nach geplanter Komp.", fm(r.saldoEnd))
       + rw("Kosten / zusaetzlicher Komp.-Tag", fm(OTP + VAC))
       + big("Zusaetzlich kompensierbar bis 31.12." + YR, f1(r.kAdd) + " Tage", "#7c3aed", "zusaetzlich zu den bereits geplanten Kompensationstagen"))
-    + card("Ziel " + ZIEL_TAGE / 5 + " Wochen (" + ZIEL_TAGE + " Tage)",
-        rw("Ferien (Anspruch)", f1(r.ferJahr) + " Tage")
-      + rw("Kompensation bezogen / geplant / zusaetzlich", r.kompPast + " / " + r.kompFut + " / " + f1(r.kAdd))
-      + rw("Noch ungeplante Komp.-Tage fuer Ziel", f1(r.kompFehlend))
-      + rw("Noetige Ueberzeit pro AT ab Stichtag", bedarf)
-      + big("Erreichbare Abwesenheit " + YR, f1(r.abwesenheit) + " Tage", zielOk ? "#16a34a" : "#dc2626", "= " + f1(r.abwesenheit / 5) + " Wochen (Ziel " + ZIEL_TAGE / 5 + ")"))
-    + card("Jahresmodell: noetige Ueberzeit fuer " + ZIEL_TAGE / 5 + " Wochen",
+    + card("Ziel " + YR + ": " + fd(ZIEL_FERIEN) + " Ferien + " + fd(ZIEL_KOMP) + " Komp. = " + fd(zt) + " Tage (" + wo + " Wochen)",
+        rw("Ferien: Ziel / eingetragen / noch einzutragen", fd(ZIEL_FERIEN) + " / " + (r.ferPast + r.ferFut) + " / " + fd(r.ferRest))
+      + (gekauft > 0 ? rw("davon gekauft (ueber Anspruch " + FERIEN_ANSPRUCH + ")", fd(gekauft) + " Tage") : "")
+      + rw("Kompensation: Ziel / bezogen / geplant / noch offen", fd(ZIEL_KOMP) + " / " + r.kompPast + " / " + r.kompFut + " / " + fd(r.kompFehlend))
+      + rw("Benoetigte OT ab Stichtag (offene Komp. &minus; Saldo + geplante Komp.)", fm(Math.max(0, r.otBedarf)))
+      + rw("AT mit Ueberzeit bis 31.12. (nach allen Ferien und Komp.)", r.wRest > 0 ? fd(r.wRest) : "keine")
+      + rw("Erreichbare Abwesenheit bei " + f1(OTP) + " Min./Tag", fd(r.abwesenheit) + " Tage (" + fd(r.abwesenheit / 5) + " Wochen)")
+      + big("Noetige Ueberzeit pro AT bis 31.12.", bedarf, r.otProTagFuerZiel === null ? "#dc2626" : "#2563eb",
+          r.otProTagFuerZiel === null ? "Bis Ende Jahr bleiben keine Arbeitstage fuer die offenen Komp.-Tage" : "damit " + fd(zt) + " Tage Ziel erreicht werden (Plan-Durchschnitt Jahr: " + f1(OTP) + " Min.)"))
+    + card("Jahresmodell: noetige Ueberzeit fuer " + fd(zt) + " Tage",
         rw("Arbeitstage " + YR + " (Kt. Zug)", y.twd)
-      + rw("&minus; Ziel-Abwesenheit", ZIEL_TAGE + " Tage")
-      + rw("= Tage mit Ueberzeit", y.arbeitstage)
-      + rw("Komp.-Tage (Ziel " + ZIEL_TAGE + " &minus; Ferien " + FERIEN_ANSPRUCH + ")", f1(y.zielKomp))
-      + rw("Benoetigte OT (" + f1(y.zielKomp) + " &times; " + fhm(VAC) + ")", fm(y.otZiel))
-      + big("Benoetigte Ueberzeit pro Arbeitstag", f1(y.otp) + " Min.", "#2563eb", fm(y.otZiel) + " &divide; " + y.arbeitstage + " AT &middot; Basis fuer Soll und Status"))
+      + rw("&minus; Ziel-Abwesenheit (" + fd(ZIEL_FERIEN) + " Ferien + " + fd(ZIEL_KOMP) + " Komp.)", fd(zt) + " Tage")
+      + rw("= Tage mit Ueberzeit", fd(y.arbeitstage))
+      + rw("Komp.-Tage laut Ziel", fd(y.zielKomp))
+      + rw("Benoetigte OT (" + fd(y.zielKomp) + " &times; " + fhm(VAC) + ")", fm(y.otZiel))
+      + big("Benoetigte Ueberzeit pro Arbeitstag", f1(y.otp) + " Min.", "#2563eb", fm(y.otZiel) + " &divide; " + fd(y.arbeitstage) + " AT &middot; Basis fuer Soll und Status"))
     + "<div class='info-box'>Saldo = Stand inkl. Stichtag. Ist = Saldo + bezogene Komp.-Tage &times; Sollzeit (" + fhm(VAC) + ", Vorfeiertag " + fhm(VAC_PRE) + "). "
     + "Soll = (AT bis Stichtag &minus; Ferien &minus; Komp.) &times; " + f1(OTP) + " Min. (aus Jahresziel berechnet). Eintraege nach dem Stichtag gelten als geplant. "
     + "Details: README.md</div>";

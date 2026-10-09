@@ -131,7 +131,7 @@ t("Gegenprobe: Tag-fuer-Tag-Simulation stimmt mit der Rechnung ueberein (300 Zuf
       if (s <= x) { if (isK) ist += ctx.sollMin(s); else if (!isF) soll += ctx.OTP; }
     });
     // Zukunft Tag fuer Tag: noch nicht eingetragene Ferien auf die ersten freien Tage legen
-    var rest = Math.max(0, ctx.FERIEN_ANSPRUCH - ferAll), bal = saldo, free = 0;
+    var rest = Math.max(0, ctx.ZIEL_FERIEN - ferAll), bal = saldo, free = 0;
     days.forEach(function (s) {
       if (s <= x || F[s] && !K[s]) return;
       if (K[s]) bal -= ctx.sollMin(s);
@@ -154,8 +154,8 @@ t("Exakt im Plan -> Hochrechnung ergibt genau das Ziel (50 Tage)", function () {
   var r = ctx.computeStatus(Object.assign({}, o, { saldo: saldo }));
   near(r.diff, 0);
   // Ungerundet: Ferien + Komp. bezogen/geplant + zusaetzlich moegliche Komp. = Ziel
-  near(r.ferJahr + r.kompPast + r.kompFut + r.saldoEnd / (454 + ctx.OTP), ctx.ZIEL_TAGE);
-  assert.ok(r.abwesenheit <= ctx.ZIEL_TAGE && r.abwesenheit > ctx.ZIEL_TAGE - 0.5); // kAdd auf halbe Tage abgerundet
+  near(r.ferJahr + r.kompPast + r.kompFut + r.saldoEnd / (454 + ctx.OTP), ctx.zielTage());
+  assert.ok(r.abwesenheit <= ctx.zielTage() && r.abwesenheit > ctx.zielTage() - 0.5); // kAdd auf halbe Tage abgerundet
   near(r.otProTagFuerZiel, ctx.OTP);   // Aufholrate = Planrate
 });
 
@@ -180,6 +180,51 @@ t("Wochenende/Feiertag in Bereich zaehlt nicht", function () {
 t("Ungueltige Daten werden ignoriert", function () {
   var a = ctx.analyzeEntries([{ f: "2026-02-30" }, { f: "abc" }, { f: "2026-05-05", t: "2026-05-01" }]);
   assert.strictEqual(ctx.keys(a.wd).length, 0);
+});
+
+// ----- Anpassbares Ziel (Ferien inkl. gekaufte + Kompensation) -----
+function mitZiel(f, k, fn) { ctx.setZiel(f, k); try { fn(); } finally { ctx.setZiel(25, 25); } }
+
+t("Ziel 30 Ferien + 25 Komp. (55 Tage): OT/Tag = 25 x 7h34 / (252 - 55)", function () {
+  mitZiel(30, 25, function () {
+    near(ctx.OTP, 25 * 454 / 197);                 // 57.6 Min
+    var y = ctx.computeYearModel();
+    near(y.arbeitstage, 197);
+  });
+  near(ctx.OTP, 25 * 454 / 202);                   // zurueckgesetzt
+});
+
+t("Ziel 27 Ferien + 23 Komp. (50 Tage): weniger Komp. -> weniger OT/Tag", function () {
+  mitZiel(27, 23, function () { near(ctx.OTP, 23 * 454 / 202); });   // 51.7 Min
+});
+
+t("Ziel mit gekauften Ferien: Hochrechnung rechnet mit 30 Ferientagen, keine Warnung", function () {
+  mitZiel(30, 25, function () {
+    var fer = [{ f: "2026-02-02", t: "2026-02-27" }, { f: "2026-11-16", t: "2026-11-20" }]; // 20 + 5 eingetragen
+    var r = st({ ferien: fer });
+    near(r.ferRest, 5);                            // 30 - 25 noch einzutragen
+    near(r.ferJahr, 30);
+    near(r.ferUeber, 0);
+    assert.strictEqual(r.kompFehlend, 25);
+  });
+});
+
+t("Mehr Ferien eingetragen als im Ziel -> Warnung (ferUeber)", function () {
+  mitZiel(20, 25, function () {
+    var r = st({ ferien: [{ f: "2026-02-02", t: "2026-02-27" }, { f: "2026-03-02", t: "2026-03-06" }] }); // 25
+    near(r.ferUeber, 5);
+  });
+});
+
+t("Exakt im Plan mit eigenem Ziel (30 + 25) -> Hochrechnung ergibt 55 Tage, Aufholrate = Planrate", function () {
+  mitZiel(30, 25, function () {
+    var o = { stichtag: "2026-06-30", komp: [{ f: "2026-03-10", t: "2026-03-12" }], ferien: [{ f: "2026-02-16", t: "2026-02-20" }] };
+    var r0 = ctx.computeStatus(Object.assign({}, o, { saldo: 0 }));
+    var r = ctx.computeStatus(Object.assign({}, o, { saldo: r0.otS - r0.kompPastMin }));
+    near(r.diff, 0);
+    near(r.ferJahr + r.kompPast + r.kompFut + r.saldoEnd / (454 + ctx.OTP), 55);
+    near(r.otProTagFuerZiel, ctx.OTP);
+  });
 });
 
 console.log("\n" + ok + " Tests bestanden");

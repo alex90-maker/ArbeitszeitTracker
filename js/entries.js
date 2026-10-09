@@ -72,8 +72,31 @@ function renderStaticTexts() {
   document.title = t;
   document.getElementById("appTitle").textContent = t;
   document.getElementById("calTitle").textContent = "Kalender " + YR;
-  document.getElementById("subInfo").textContent = PENSUM + "% Pensum \u00b7 " + f1(OTP) + " Min. Ueberzeit/Tag \u00b7 "
-    + FERIEN_ANSPRUCH + " Tage Ferien \u00b7 Ziel: " + ZIEL_TAGE / 5 + " Wochen Abwesenheit";
+  document.getElementById("subInfo").textContent = PENSUM + "% Pensum \u00b7 " + f1(OTP) + " Min. Ueberzeit/Tag \u00b7 Ziel: "
+    + fd(ZIEL_FERIEN) + " Ferien + " + fd(ZIEL_KOMP) + " Komp. = " + fd(zielTage() / 5) + " Wochen Abwesenheit";
+  document.getElementById("zielTitle").textContent = "Ziel Abwesenheit " + YR;
+  document.getElementById("zielFerien").value = ZIEL_FERIEN;
+  document.getElementById("zielKomp").value = ZIEL_KOMP;
+  var g = ZIEL_FERIEN - FERIEN_ANSPRUCH;
+  document.getElementById("zielInfo").textContent = "Total " + fd(zielTage()) + " Tage = " + fd(zielTage() / 5) + " Wochen"
+    + (g > 0 ? " \u00b7 davon " + fd(g) + " Ferientage gekauft" : "") + " \u00b7 noetig: " + f1(OTP) + " Min. Ueberzeit/Tag";
+}
+
+// Zahl >= 0 aus Eingabe ("27.5" oder "27,5"); null wenn ungueltig
+function pnum(s) {
+  s = (s || "").trim().replace(",", ".");
+  if (!/^\d+(\.\d+)?$/.test(s)) return null;
+  return parseFloat(s);
+}
+
+// Ziel geaendert: OTP neu berechnen, Texte und (falls Saldo vorhanden) Ergebnis aktualisieren
+function onZielChange() {
+  var f = pnum(document.getElementById("zielFerien").value), k = pnum(document.getElementById("zielKomp").value);
+  if (f === null || k === null) { showNotice("Ziel: bitte Zahlen eingeben (z.B. 27 oder 27.5)"); renderStaticTexts(); return; }
+  if (f === ZIEL_FERIEN && k === ZIEL_KOMP) return;
+  setZiel(f, k);
+  renderStaticTexts(); ut();
+  if (pt(document.getElementById("saldo").value) !== null) calculate();
 }
 
 // Zeigt unter dem Titel, auf welchen Stichtag sich der Saldo bezieht
@@ -95,7 +118,7 @@ function ut() {
   var f = analyzeEntries(ferienEnts), fp = 0, ff = 0;
   for (var t in f.wd) { if (k.wd[t]) continue; if (t <= x) fp++; else ff++; }  // Konflikttage zaehlen als Kompensation
   document.getElementById("ftotal").textContent = (fp + ff) > 0
-    ? (fp + ff) + " Arbeitstage eingetragen (" + fp + " bezogen, " + ff + " geplant) von " + FERIEN_ANSPRUCH : "";
+    ? (fp + ff) + " Arbeitstage eingetragen (" + fp + " bezogen, " + ff + " geplant) von " + fd(ZIEL_FERIEN) + " laut Ziel" : "";
 
   var db = findDoubleBookings(), msg = [];
   if (db.both.length)   msg.push("Ferien und Kompensation am selben Tag: " + listCH(db.both) + ". Gerechnet wird als Kompensation.");

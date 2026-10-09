@@ -78,6 +78,9 @@ function fhm(x) { var a = Math.round(x); return Math.floor(a / 60) + "h" + p2(a 
 // Zahl mit einer Nachkommastelle
 function f1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
 
+// Tage: ganze Zahlen ohne ".0", sonst eine Nachkommastelle (25, 27.5)
+function fd(x) { var r = Math.round(x * 10) / 10; return r % 1 === 0 ? "" + r : r.toFixed(1); }
+
 // Alle Kalendertage einer Eintragsliste als Set { "YYYY-MM-DD": true }.
 // Eintrag: { f, t } (Bereich) oder nur { f } (einzelner Tag).
 function getDaysSet(list) {

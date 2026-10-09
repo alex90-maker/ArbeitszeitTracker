@@ -2,6 +2,18 @@
 
 Neueste Einträge oben. Pro Eintrag: was geändert wurde, warum, und offene Punkte.
 
+## 2026-10-09 – Ziel anpassbar (gekaufte Ferien)
+
+- Neue Eingabekarte „Ziel Abwesenheit“: Ferientage (inkl. gekaufte) + Kompensationstage. Total und Wochen werden angezeigt, Ferien über dem Anspruch (25) als „gekauft“.
+- `OTP` = Ziel-Komp. × 7h34 ÷ (AT − Ziel-Ferien − Ziel-Komp.). Beispiele: 30 + 25 → 57.6 Min., 27 + 23 → 51.7 Min.
+- Hochrechnung rechnet mit den Ferien laut Ziel statt mit dem Anspruch. Warnung neu, wenn mehr Ferien eingetragen sind als im Ziel.
+- Offene Komp.-Tage = Ziel-Komp. − bezogen − geplant (vorher: Total − Ferien). Unterschied nur, wenn mehr Ferien eingetragen sind als im Ziel.
+- Ziel-Karte im Ergebnis zeigt Aufteilung und als Hauptzahl „Nötige Überzeit pro AT bis 31.12.“.
+- Ziel wird im Link gespeichert (`z: [Ferien, Komp.]`); alte Links laden mit 25 + 25.
+- *Entscheid:* Eingabe als eigene Karte links statt in der Ergebnis-Karte (die wird bei jeder Berechnung neu aufgebaut, Eingabefelder würden den Fokus verlieren).
+- *Folge:* Status (Plus/Minus) misst am aktuellen Ziel – ein unterjährig erhöhtes Ziel zeigt sofort Minus.
+- Tests: 5 neue (23 total).
+
 ## 2026-10-08 – Stichtag beim Laden immer gestern
 
 - Der Stichtag wird nicht mehr im Link gespeichert/geladen. Beim Öffnen der Seite steht er immer auf gestern (Entscheid Alex).
