@@ -4,11 +4,15 @@ var PENSUM = 90;              // Pensum in % (nur Anzeige - VAC/VAC_PRE muessen 
 var VAC = 454;                // Sollzeit pro Arbeitstag bei 90% in Minuten (7h34)
 var VAC_PRE = 400;            // Sollzeit an Vorfeiertagen bei 90% in Minuten (6h40)
 var OTP = 0;                  // noetige Ueberzeit pro gearbeitetem Tag in Min. - wird aus dem Ziel berechnet (initTWD)
-var FERIEN_ANSPRUCH = 25;     // Ferienanspruch pro Jahr in Tagen
-var ZIEL_TAGE = 50;           // Ziel: Abwesenheit total (Ferien + Kompensation) in Tagen = 10 Wochen
+var FERIEN_ANSPRUCH = 25;     // Ferienanspruch pro Jahr in Tagen (vertraglich; mehr Ferien = gekauft)
+
+// Jahresziel (in der App unter "Ziel" anpassbar, im Link gespeichert). Startwerte:
+var ZIEL_FERIEN = 25;         // geplante Ferientage im Jahr (inkl. gekaufte)
+var ZIEL_KOMP = 25;           // geplante Kompensationstage im Jahr (aus Ueberzeit)
 
 // Laufzeitzustand
 var TWD = 0;
+function zielTage() { return ZIEL_FERIEN + ZIEL_KOMP; }   // Ziel Abwesenheit total
 var kompEnts = [];
 var ferienEnts = [];
 

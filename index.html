@@ -40,6 +40,18 @@
         <div class="ftotal" id="ftotal"></div>
       </div>
 
+      <div class="card">
+        <label id="zielTitle">Ziel Abwesenheit</label>
+        <div class="erow">
+          <div style="flex:1"><p class="stitle">Ferientage</p>
+            <input type="text" id="zielFerien" inputmode="decimal" onblur="onZielChange()"></div>
+          <div style="flex:1"><p class="stitle">Kompensationstage</p>
+            <input type="text" id="zielKomp" inputmode="decimal" onblur="onZielChange()"></div>
+        </div>
+        <div class="ktotal" id="zielInfo"></div>
+        <p class="hint">Ferien ueber dem Anspruch gelten als gekauft. Halbe Tage mit .5 (z.B. 27.5).</p>
+      </div>
+
       <div class="warn-box" id="dblWarn" style="display:none"></div>
 
       <div class="btn-row">
